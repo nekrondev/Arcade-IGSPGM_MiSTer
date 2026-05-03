@@ -31,10 +31,6 @@ module IGS023_Sprite(
     ddr_if.to_host    ddr
 );
 
-wire [22:0] brom_word_address = spr_y_flip ? (spr_brom_addr - { 7'b0, spr.brom_offset }) : (spr_brom_addr + { 7'b0, spr.brom_offset });
-assign brom_address = { brom_word_address, 1'b0 };
-
-
 typedef enum bit [4:0] {
     DMA_IDLE, DMA_BUS_REQUEST, DMA_READ0, DMA_READ1, DMA_READ2, DMA_READ3, DMA_FINISH,
     PRESCAN_LOAD, PRESCAN_INITIAL_BROM, PRESCAN_INITIAL_BROM_WAIT, PRESCAN_INITIAL_NEXT,
@@ -79,6 +75,9 @@ typedef struct
 
 volatile_sprite_state_t sprite_state[256];
 volatile_sprite_state_t spr;
+
+wire [22:0] brom_word_address = spr_y_flip ? (spr_brom_addr - { 7'b0, spr.brom_offset }) : (spr_brom_addr + { 7'b0, spr.brom_offset });
+assign brom_address = { brom_word_address, 1'b0 };
 
 logic [15:0] spr_brom_data;
 always_comb begin
