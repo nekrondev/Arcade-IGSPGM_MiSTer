@@ -729,7 +729,7 @@ wire ics2115_reset_n;
 wire [22:0] ics2115_rom_addr /* verilator public_flat */;
 wire [15:0] ics2115_rom_q;
 wire        ics2115_rom_read;
-wire        ics2115_data_valid;
+wire        ics2115_data_valid /* verilator public_flat */;
 wire  [4:0] ics2115_voice_id;
 wire signed [15:0] ics2115_audio_left;
 wire signed [15:0] ics2115_audio_right;

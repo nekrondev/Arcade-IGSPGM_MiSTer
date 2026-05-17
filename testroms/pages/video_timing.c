@@ -144,8 +144,6 @@ static void update()
         }
 
         text_cursor(20, 18);
-        // PGM  = 0x9158a
-        // FPGA = 0x91590
         textf("TEST COUNTS: %08u", simple_inc);
     }
 
@@ -161,11 +159,6 @@ static void update()
         }
 
         text_cursor(20, 19);
-        // Normal
-        // PGM = 0x42480 - 0x424E0
-        // FPGA = 0x04DD0
-        // Bus Master
-        // PGM = 0x583ED
         textf("VRAM WRITES: %08u", simple_inc);
     }
 
@@ -181,11 +174,6 @@ static void update()
         }
 
         text_cursor(20, 19);
-        // Normal
-        // PGM = 0x42480 - 0x424E0
-        // FPGA = 0x04DD0
-        // Bus Master
-        // PGM = 0x583ED
         textf("VRAM WRITES: %08u", simple_inc);
     }
 

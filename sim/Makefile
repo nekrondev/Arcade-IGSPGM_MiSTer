@@ -14,6 +14,7 @@ GAME ?= pgm
 
 VERILATOR = verilator
 VERILATOR_ARGS = --cc --make gmake --trace-fst --vpi --Mdir $(VERILATED_DIR) -Ihdl --MMD --MP \
+				-CFLAGS -Wno-unknown-warning-option \
 				-Wno-TIMESCALEMOD \
 				-Wno-WIDTHEXPAND -Wno-WIDTHTRUNC \
           		-Wno-CASEINCOMPLETE -Wno-UNUSEDSIGNAL
