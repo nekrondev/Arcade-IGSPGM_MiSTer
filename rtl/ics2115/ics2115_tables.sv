@@ -1,8 +1,9 @@
 // ICS2115 Lookup Tables
-// Volume (4096×16), Pan Law (256×12), µ-Law Decode (256×16 signed)
+// Volume (4096×16) and pan law (256×12)
 //
 // Volume table: registered (1-cycle latency) for timing closure
-// Pan and µ-law: combinational
+// Pan table: combinational
+// µ-law decode is implemented as a local function in ics2115_osc.
 
 module ics2115_tables (
     input  logic        clk,
@@ -17,13 +18,7 @@ module ics2115_tables (
     // Input:  8-bit pan index
     // Output: attenuation value subtracted from volume index
     input  logic [7:0]  pan_addr,
-    output logic [11:0] pan_data,
-
-    // µ-Law decode — 256 entries, signed 16-bit
-    // Input:  8-bit µ-law encoded byte
-    // Output: signed 16-bit linear PCM
-    input  logic [7:0]  ulaw_addr,
-    output logic signed [15:0] ulaw_data
+    output logic [11:0] pan_data
 );
 
     // =========================================================================
@@ -74,55 +69,6 @@ module ics2115_tables (
             4'he: pan_data = 12'd12;
             4'hf: pan_data = 12'd0;
         endcase
-    end
-
-    // =========================================================================
-    // µ-Law decode table (MIL-STD-188-113 / ITU-T G.711)
-    // All bits inverted per standard.
-    //   exp  = (~i >> 4) & 7
-    //   mant = ~i & 0xF
-    //   base = (132 << exp) - 132
-    //   value = base + (mant << (exp + 3))
-    //   sign: bit 7 of original byte — 1 = negative (per MAME)
-    // =========================================================================
-    always_comb begin
-        logic [2:0]  ulaw_exp;
-        logic [3:0]  ulaw_mant;
-        logic [15:0] lut_base;
-        logic [15:0] ulaw_value;
-
-        ulaw_exp  = (~ulaw_addr >> 4) & 3'd7;
-        ulaw_mant = ~ulaw_addr & 4'hF;
-
-        // Precomputed segment base values: (132 << exp) - 132
-        case (ulaw_exp)
-            3'd0: lut_base = 16'd0;
-            3'd1: lut_base = 16'd132;
-            3'd2: lut_base = 16'd396;
-            3'd3: lut_base = 16'd924;
-            3'd4: lut_base = 16'd1980;
-            3'd5: lut_base = 16'd4092;
-            3'd6: lut_base = 16'd8316;
-            3'd7: lut_base = 16'd16764;
-        endcase
-
-        // value = base + (mant << (exp + 3))
-        case (ulaw_exp)
-            3'd0: ulaw_value = lut_base + ({12'd0, ulaw_mant} << 3);
-            3'd1: ulaw_value = lut_base + ({12'd0, ulaw_mant} << 4);
-            3'd2: ulaw_value = lut_base + ({12'd0, ulaw_mant} << 5);
-            3'd3: ulaw_value = lut_base + ({12'd0, ulaw_mant} << 6);
-            3'd4: ulaw_value = lut_base + ({12'd0, ulaw_mant} << 7);
-            3'd5: ulaw_value = lut_base + ({12'd0, ulaw_mant} << 8);
-            3'd6: ulaw_value = lut_base + ({12'd0, ulaw_mant} << 9);
-            3'd7: ulaw_value = lut_base + ({12'd0, ulaw_mant} << 10);
-        endcase
-
-        // Sign bit: bit 7 set = negative output (matches MAME)
-        if (ulaw_addr[7])
-            ulaw_data = -$signed({1'b0, ulaw_value[14:0]});
-        else
-            ulaw_data = $signed({1'b0, ulaw_value[14:0]});
     end
 
 endmodule

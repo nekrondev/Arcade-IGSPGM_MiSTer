@@ -249,17 +249,13 @@ module ics2115
     logic [15:0] vol_tbl_data;
     logic [7:0]  pan_tbl_addr;
     logic [11:0] pan_tbl_data;
-    logic [7:0]  ulaw_tbl_addr;
-    logic signed [15:0] ulaw_tbl_data;
 
     ics2115_tables u_tables (
         .clk       (clk),
         .vol_addr  (vol_tbl_addr),
         .vol_data  (vol_tbl_data),
         .pan_addr  (pan_tbl_addr),
-        .pan_data  (pan_tbl_data),
-        .ulaw_addr (ulaw_tbl_addr),
-        .ulaw_data (ulaw_tbl_data)
+        .pan_data  (pan_tbl_data)
     );
 
     // =========================================================================
@@ -360,7 +356,6 @@ module ics2115
     logic        osc_rom_rd;
     logic [11:0] osc_vol_tbl_addr;
     logic [7:0]  osc_pan_tbl_addr;
-    logic [7:0]  osc_ulaw_tbl_addr;
     logic signed [23:0] osc_audio_left;
     logic signed [23:0] osc_audio_right;
     logic        osc_audio_valid;
@@ -388,8 +383,6 @@ module ics2115
         .vol_tbl_data  (vol_tbl_data),
         .pan_tbl_addr  (osc_pan_tbl_addr),
         .pan_tbl_data  (pan_tbl_data),
-        .ulaw_tbl_addr (osc_ulaw_tbl_addr),
-        .ulaw_tbl_data (ulaw_tbl_data),
         .audio_left    (osc_audio_left),
         .audio_right   (osc_audio_right),
         .audio_valid   (osc_audio_valid)
@@ -398,7 +391,6 @@ module ics2115
     // Connect oscillator table ports to tables module
     assign vol_tbl_addr  = osc_vol_tbl_addr;
     assign pan_tbl_addr  = osc_pan_tbl_addr;
-    assign ulaw_tbl_addr = osc_ulaw_tbl_addr;
 
     // ROM address translation: byte address → word address
     assign rom_addr    = osc_rom_byte_addr[23:1];

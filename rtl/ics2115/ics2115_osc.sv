@@ -37,8 +37,6 @@ module ics2115_osc
     input  logic [15:0] vol_tbl_data,
     output logic [7:0]  pan_tbl_addr,
     input  logic [11:0] pan_tbl_data,
-    output logic [7:0]  ulaw_tbl_addr,
-    input  logic signed [15:0] ulaw_tbl_data,
 
     // Audio accumulation — signed accumulators, caller sums across voices
     output logic signed [23:0] audio_left,
@@ -208,6 +206,44 @@ module ics2115_osc
         return {saddr[3:0], addr};
     endfunction
 
+    function automatic logic signed [15:0] ulaw_decode(input logic [7:0] code);
+        logic [2:0]  ulaw_exp;
+        logic [3:0]  ulaw_mant;
+        logic [15:0] lut_base;
+        logic [15:0] ulaw_value;
+        begin
+            ulaw_exp  = (~code >> 4) & 3'd7;
+            ulaw_mant = ~code & 4'hF;
+
+            case (ulaw_exp)
+                3'd0: lut_base = 16'd0;
+                3'd1: lut_base = 16'd132;
+                3'd2: lut_base = 16'd396;
+                3'd3: lut_base = 16'd924;
+                3'd4: lut_base = 16'd1980;
+                3'd5: lut_base = 16'd4092;
+                3'd6: lut_base = 16'd8316;
+                3'd7: lut_base = 16'd16764;
+            endcase
+
+            case (ulaw_exp)
+                3'd0: ulaw_value = lut_base + ({12'd0, ulaw_mant} << 3);
+                3'd1: ulaw_value = lut_base + ({12'd0, ulaw_mant} << 4);
+                3'd2: ulaw_value = lut_base + ({12'd0, ulaw_mant} << 5);
+                3'd3: ulaw_value = lut_base + ({12'd0, ulaw_mant} << 6);
+                3'd4: ulaw_value = lut_base + ({12'd0, ulaw_mant} << 7);
+                3'd5: ulaw_value = lut_base + ({12'd0, ulaw_mant} << 8);
+                3'd6: ulaw_value = lut_base + ({12'd0, ulaw_mant} << 9);
+                3'd7: ulaw_value = lut_base + ({12'd0, ulaw_mant} << 10);
+            endcase
+
+            if (code[7])
+                ulaw_decode = $signed({1'b0, ulaw_value[14:0]});
+            else
+                ulaw_decode = -$signed({1'b0, ulaw_value[14:0]});
+        end
+    endfunction
+
     // =========================================================================
     // FSM next-state logic
     // =========================================================================
@@ -259,7 +295,6 @@ module ics2115_osc
             next_addr     <= 20'd0;
             vol_tbl_addr  <= 12'd0;
             pan_tbl_addr  <= 8'd0;
-            ulaw_tbl_addr <= 8'd0;
             v             <= '0;
         end else if (ce) begin
             // Defaults — pulsed signals cleared each cycle
@@ -388,12 +423,10 @@ module ics2115_osc
 
                     // Decode sample1 from ROM data
                     if (osc_conf_ulaw) begin
-                        // µ-law: extract byte, send to decode table
                         if (~cur_addr[0])
-                            ulaw_tbl_addr <= rom_data[15:8];
+                            sample1 <= ulaw_decode(rom_data[15:8]);
                         else
-                            ulaw_tbl_addr <= rom_data[7:0];
-                        // sample1 will be latched from ulaw_tbl_data next cycle
+                            sample1 <= ulaw_decode(rom_data[7:0]);
                     end else if (osc_conf_8bit_linear) begin
                         // 8-bit signed: extract byte and shift left by 8.
                         // MAME/reference: (s8(sample_byte) << 8).  The low
@@ -414,17 +447,13 @@ module ics2115_osc
 
                 // ─────────────────────────────────────────────────────────────
                 // SAMPLE_WAIT: ROM data for sample2 arrived. Latch sample2.
-                // For µ-law: latch sample1 from table, setup sample2 decode.
                 // ─────────────────────────────────────────────────────────────
                 ST_SAMPLE_WAIT: begin
-                    // For µ-law: sample1 decode is ready (combinational table)
                     if (osc_conf_ulaw) begin
-                        sample1 <= ulaw_tbl_data;
-                        // Now decode sample2
                         if (~next_addr[0])
-                            ulaw_tbl_addr <= rom_data[15:8];
+                            sample2 <= ulaw_decode(rom_data[15:8]);
                         else
-                            ulaw_tbl_addr <= rom_data[7:0];
+                            sample2 <= ulaw_decode(rom_data[7:0]);
                     end else if (osc_conf_8bit_linear) begin
                         // Decode sample2 from ROM data: (s8(sample_byte) << 8).
                         if (~next_addr[0])
@@ -438,21 +467,9 @@ module ics2115_osc
 
                 // ─────────────────────────────────────────────────────────────
                 // INTERPOLATE: Linear interpolation between sample1 & sample2
-                // For µ-law: sample2 decode completes this cycle (combinational)
                 // ─────────────────────────────────────────────────────────────
                 ST_INTERPOLATE: begin
-                    // For µ-law: latch sample2 from table and use for interp
-                    if (osc_conf_ulaw) begin
-                        sample2 <= ulaw_tbl_data;
-                        // Use ulaw_tbl_data directly in combinational interp
-                        // Recalculate with correct sample2
-                        interp_sample <= (($signed({1'b0, sample1}) <<< 9) +
-                                         ((ulaw_tbl_data - sample1) *
-                                          $signed({1'b0, interp_fract}))) >>> 9;
-                    end else begin
-                        // Normal path: samples already latched
-                        interp_sample <= interp_raw[24:9];
-                    end
+                    interp_sample <= interp_raw[24:9];
                 end
 
                 // ─────────────────────────────────────────────────────────────
