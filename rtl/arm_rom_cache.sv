@@ -28,9 +28,9 @@ module arm_rom_cache #(
     wire [1:0] beat_sel = addr[4:3];   // which 64-bit beat in the line
     wire       hi_sel   = addr[2];     // high/low 32 bits of the beat
 
-    logic [ADDR_BITS-1:OFFB] line_d;
-    always_ff @(posedge clk) line_d <= addr[ADDR_BITS-1:OFFB];
-    wire addr_stable = (addr[ADDR_BITS-1:OFFB] == line_d);
+    logic [ADDR_BITS-1:2] word_d;
+    always_ff @(posedge clk) word_d <= addr[ADDR_BITS-1:2];
+    wire addr_stable = (addr[ADDR_BITS-1:2] == word_d);
 
     typedef enum logic [1:0] { IDLE, REQ, FILL } state_t;
     state_t          state;
@@ -54,9 +54,12 @@ module arm_rom_cache #(
         .clock_a(clk), .wren_a(tag_we), .address_a(fill_idx), .data_a(fill_tag), .q_a(),
         .clock_b(clk), .wren_b(1'b0),   .address_b(idx),      .data_b('0),       .q_b(tag_q)
     );
+
+    logic just_filled;
+
     wire hit = req & addr_stable & cache_valid[idx] & (tag_q == tag);
 
-    assign ready = ~req | hit;
+    assign ready = ~req | (hit & ~just_filled);
 
     assign ddr.acquire    = (state != IDLE);
     assign ddr.write      = 1'b0;
@@ -70,12 +73,16 @@ module arm_rom_cache #(
             ddr.read <= 1'b0;
             ddr.addr <= 32'd0;
             ddr.burstcnt <= 8'd0;
+            just_filled <= 1'b0;
             for (i = 0; i < LINES; i = i + 1) cache_valid[i] <= 1'b0;
         end else begin
+            just_filled <= 1'b0;
             case (state)
                 IDLE: begin
                     ddr.read <= 1'b0;
-                    if (req & ~hit) begin
+                    // miss only when address stable (registered tag valid) and not
+                    // the cycle after a fill (stale cross-port tag).
+                    if (req & addr_stable & ~hit & ~just_filled) begin
                         fill_idx  <= idx;
                         fill_tag  <= tag;
                         fill_beat <= 2'd0;
@@ -101,6 +108,7 @@ module arm_rom_cache #(
                         if (fill_beat == BEATS[1:0] - 2'd1) begin
                             // tag written to the tag BRAM via tag_we (above)
                             cache_valid[fill_idx] <= 1'b1;
+                            just_filled           <= 1'b1;
                             state                 <= IDLE;
                         end
                     end

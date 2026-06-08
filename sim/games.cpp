@@ -1066,6 +1066,45 @@ static std::vector<uint8_t> MakeDmnfrntDummyIntRom()
     return rom;
 }
 
+// ARM cache stress test loaded as the internal ROM (see sim/cachetest_arm.s).
+// Self-consistency checker for the three DDR caches: it checksums the external ROM
+// (arm_rom_cache) and internal ROM (prot_cache) three ways each and writes+reads a
+// pattern through iram (ram_cache); a pattern-dependent cache bug makes the results
+// disagree.  Result lands in ARM r0..r5 (read via dbg_rN), then it spins at `done`.
+//   r0 = fail flags (bit0 ext, bit1 int, bit2 iram; 0 = pass)
+//   r1 = ext fwd checksum   r2 = int fwd checksum
+//   r3 = iram first-fail idx (0xffffffff = none)  r4 = iram got  r5 = iram expected
+static std::vector<uint8_t> MakeDmnfrntCacheTest()
+{
+    static const uint32_t code[] = {
+        0xe3a0b000, 0xe3a00302, 0xe3a0c902, 0xe3a02000, 0xe3a03000, 0xe7904003,
+        0xe0822004, 0xe2833004, 0xe153000c, 0xbafffffa, 0xe1a0a002, 0xe3a02000,
+        0xe1a0300c, 0xe2433004, 0xe7904003, 0xe0822004, 0xe3530000, 0xcafffffa,
+        0xe152000a, 0x138bb001, 0xe3a02000, 0xe3a05000, 0xe1a03005, 0xe7904003,
+        0xe0822004, 0xe2833020, 0xe153000c, 0xbafffffa, 0xe2855004, 0xe3550020,
+        0xbafffff6, 0xe152000a, 0x138bb001, 0xe3a00000, 0xe3a0c901, 0xe3a02000,
+        0xe3a03000, 0xe7904003, 0xe0822004, 0xe2833004, 0xe153000c, 0xbafffffa,
+        0xe1a09002, 0xe3a02000, 0xe1a0300c, 0xe2433004, 0xe7904003, 0xe0822004,
+        0xe3530000, 0xcafffffa, 0xe1520009, 0x138bb002, 0xe3a02000, 0xe3a05000,
+        0xe1a03005, 0xe7904003, 0xe0822004, 0xe2833020, 0xe153000c, 0xbafffffa,
+        0xe2855004, 0xe3550020, 0xbafffff6, 0xe1520009, 0x138bb002, 0xe3a00306,
+        0xe59f1084, 0xe3a0c902, 0xe3a03000, 0xe0814123, 0xe7804003, 0xe2833004,
+        0xe153000c, 0xbafffffa, 0xe3e08000, 0xe3a05000, 0xe1a03005, 0xe0814123,
+        0xe7902003, 0xe1520004, 0x1a000006, 0xe2833020, 0xe153000c, 0xbafffff8,
+        0xe2855004, 0xe3550020, 0xbafffff4, 0xea000005, 0xe3780001, 0x01a08123,
+        0x01a07002, 0x01a06004, 0xe38bb004, 0xeafffff2, 0xe1a0000b, 0xe1a0100a,
+        0xe1a02009, 0xe1a03008, 0xe1a04007, 0xe1a05006, 0xeafffffe, 0xc0de0000,
+    };
+    std::vector<uint8_t> rom(0x4000, 0);
+    auto w32 = [&](uint32_t off, uint32_t v) {
+        rom[off] = v & 0xff; rom[off + 1] = (v >> 8) & 0xff;
+        rom[off + 2] = (v >> 16) & 0xff; rom[off + 3] = (v >> 24) & 0xff;
+    };
+    for (uint32_t off = 0; off < 0x4000; off += 4) w32(off, 0xe12fff1e); // BX lr fill
+    for (uint32_t k = 0; k < sizeof(code) / 4; k++) w32(4 * k, code[k]);
+    return rom;
+}
+
 // Demon Front (V105).  IGS027A type3 (55857G), 22 MHz.  68k program plaintext;
 // external ARM ROM encrypted (pgm_dfront_decrypt).  Internal ROM undumped -> use
 // the synthesized dummy stub that jumps straight into the external ARM ROM.
@@ -1081,8 +1120,12 @@ static void LoadDmnfrnt()
     LoadSdramData("igs_b04501w064.u9", 0x29320b7d, CART_B_ROM_SDR_BASE + 0x0000000);
     LoadSdramData("igs_b04502w016.u11", 0x578c00e9, CART_B_ROM_SDR_BASE + 0x0800000);
     LoadSdramData("igs_w04501b064.u5", 0x3ab58137, CART_MUSIC_ROM_SDR_BASE);
-    // synthesized dummy internal ARM ROM (real one is undumped)
-    gSimCore.mDDRMemory->LoadData(MakeDmnfrntDummyIntRom(), PROT_INT_ROM_DDR_BASE, 1);
+    // synthesized dummy internal ARM ROM (real one is undumped).  With
+    // PGM_CACHETEST set, load the ARM cache stress test instead (tests the DDR
+    // caches directly; the game itself will not boot in this mode).
+    gSimCore.mDDRMemory->LoadData(
+        getenv("PGM_CACHETEST") ? MakeDmnfrntCacheTest() : MakeDmnfrntDummyIntRom(),
+        PROT_INT_ROM_DDR_BASE, 1);
     LoadArmExrom(GAME_DMNFRNT, "v105_32m.u26", 0xc798c2ef, CART_ARM_ROM_DDR_BASE);
     gSimCore.mTop->rootp->sim_top__DOT__cart_present = 1;
     gSimCore.mTop->rootp->sim_top__DOT__cart_prog_base = 0x100000;
