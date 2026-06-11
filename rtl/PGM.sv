@@ -562,7 +562,7 @@ wire [15:0] workram_data, workram_q;
 wire workram_dma = ~cpu_bgack_n;
 
 wire [15:0] nvram_q_word;
-assign nvram_q = nvram_addr[0] ? nvram_q_word[7:0] : nvram_q_word[15:8];
+assign nvram_q = ~nvram_addr[0] ? nvram_q_word[7:0] : nvram_q_word[15:8];
 
 m68k_ram_dp #(.WIDTHAD(16)) work_ram(
     .clock(clk),
@@ -573,8 +573,8 @@ m68k_ram_dp #(.WIDTHAD(16)) work_ram(
     .q_a(workram_q),
 
     .address_b(nvram_addr[16:1]),
-    .we_uds_n_b(~(nvram_wr & ~nvram_addr[0])), // even byte addr = D15:8 (68k byte order)
-    .we_lds_n_b(~(nvram_wr & nvram_addr[0])),
+    .we_uds_n_b(~(nvram_wr & nvram_addr[0])), // even byte addr = D15:8 (68k byte order)
+    .we_lds_n_b(~(nvram_wr & ~nvram_addr[0])),
     .data_b({nvram_data, nvram_data}),
     .q_b(nvram_q_word)
 );
