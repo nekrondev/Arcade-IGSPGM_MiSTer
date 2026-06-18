@@ -1,3 +1,20 @@
+//============================================================================
+//  Copyright (C) 2026 Martin Donlon
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+//============================================================================
+
 module arm_rom_cache #(
     parameter int      ADDR_BITS = 23,        // external ROM window (8MB)
     parameter [31:0]   DDR_BASE  = 32'h0       // byte base of the ROM in DDR
