@@ -26,6 +26,8 @@ module IGS023_BG(
     input [10:0] y,
     input [7:0] screen_y,
 
+    input global_flip_x,
+
     output [9:0] color_out,
 
     input [31:0] scale_bits_x,
@@ -82,11 +84,12 @@ reg [6:0] vram_row_addr;
 reg [7:0] tile_addr;
 
 wire [10:0] scrolled_x = x + scroll[10:0];
+wire [10:0] scrolled_x_r = scrolled_x + 11'd447;
 
 reg [15:0] tile_code;
 reg [7:0] tile_attrib;
 wire flip_y = tile_attrib[7];
-wire flip_x = tile_attrib[6];
+wire flip_x = tile_attrib[6] ^ global_flip_x;
 
 function automatic [4:0] stream5(input [5:0] base);
 begin
@@ -252,11 +255,11 @@ always_ff @(posedge clk) begin
             end
 
             APPLY_SCROLL: begin
-                pixel_out_idx <= { 4'd1, scrolled_x[4:0] };
+                pixel_out_idx <= { 4'd1, global_flip_x ? ~scrolled_x_r[4:0] : scrolled_x[4:0] };
                 scale_shifter_x <= 0; //scale_bits_x;
                 pixel_in_idx <= 0;
                 vram_row_addr <= { 1'b0, y[10:5] };
-                tile_addr <= {scrolled_x[10:5], 2'b00};
+                tile_addr <= { global_flip_x ? scrolled_x_r[10:5] : scrolled_x[10:5], 2'b00 };
                 state <= READ0;
             end
 
@@ -275,7 +278,7 @@ always_ff @(posedge clk) begin
             end
             READ3: begin
                 tile_attrib[7:0] <= vram_din;
-                tile_addr <= tile_addr + 2;
+                tile_addr <= global_flip_x ? (tile_addr - 8'd6) : (tile_addr + 8'd2);
                 state <= ROM_REQ0;
             end
 

@@ -77,7 +77,11 @@ class SimVideo : public Window
         {
             if (!mInVsync)
                 mX = 0;
-            mY = 0;
+            // -1, not 0: the hblank rising edge at the start of the first active line
+            // increments mY, so it must land on row 0 (not 1).  Resetting to 0 here put
+            // the first visible line in row 1 (row 0 garbage) and pushed the last line to
+            // mY==mHeight, where the bounds check dropped it.
+            mY = -1;
         }
 
         mInHsync = hsync;
@@ -136,6 +140,10 @@ class SimVideo : public Window
     {
         ImGui::Checkbox("TATE", &mRotated);
         ImGui::SameLine();
+        ImGui::Checkbox("Flip X", &mFlipX);
+        ImGui::SameLine();
+        ImGui::Checkbox("Flip Y", &mFlipY);
+        ImGui::SameLine();
         ImGui::Text("X: %03d Y: %03d", mX, mY);
 
         if (!mScreenshotStatus.empty())
@@ -186,6 +194,10 @@ class SimVideo : public Window
     uint32_t *mPixels = nullptr;
 
     bool mRotated;
+
+    // Global screen-flip checkboxes; driven into sim_top->flip_x / flip_y each tick.
+    bool mFlipX = false;
+    bool mFlipY = false;
 
     int mX, mY;
     bool mInHsync, mInVsync, mInCe;

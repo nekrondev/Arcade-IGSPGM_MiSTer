@@ -95,10 +95,8 @@ HDL_SRC += verilator.vlt
 ifeq ($(USE_AUTO_SS),1)
 VERILATOR_ARGS += -DUSE_AUTO_SS
 HDL_SRC += ../rtl/tv80_auto_ss.sv
-HDL_SRC += ../rtl/jt10_auto_ss.sv
 else
 HDL_SRC += ../rtl/tv80/tv80s.v ../rtl/tv80/tv80_alu.v ../rtl/tv80/tv80_reg.v ../rtl/tv80/tv80_core.v ../rtl/tv80/tv80_mcode.v
-VERILATOR_ARGS += -F ../rtl/jt12/ver/verilator/gather.f
 endif
 
 all: sim

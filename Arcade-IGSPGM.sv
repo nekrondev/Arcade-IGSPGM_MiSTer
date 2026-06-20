@@ -26,7 +26,7 @@ module emu
     input         RESET,
 
     //Must be passed to hps_io module
-    inout  [45:0] HPS_BUS,
+    inout  [48:0] HPS_BUS,
 
     //Base video clock. Usually equals to CLK_SYS.
     output        CLK_VIDEO,
@@ -55,7 +55,6 @@ module emu
     input  [11:0] HDMI_HEIGHT,
     output        HDMI_FREEZE,
     output        HDMI_BLACKOUT,
-	output        HDMI_BOB_DEINT,
 
 `ifdef MISTER_FB
     // Use framebuffer in DDRAM
@@ -185,7 +184,6 @@ assign VGA_SCALER  = 0;
 assign VGA_DISABLE = 0;
 assign HDMI_FREEZE = 0;
 assign HDMI_BLACKOUT = 0;
-assign HDMI_BOB_DEINT = 0;
 
 assign AUDIO_R = AUDIO_L;
 assign AUDIO_S = 1;
@@ -207,6 +205,7 @@ localparam CONF_STR = {
     "P1O[7:6],Scale,Normal,V-Integer,Narrower HV-Integer,Wider HV-Integer;",
     "P1-;",
     "P1O[8],Orientation,Horz,Vert;",
+    "P1O[26],Flip Screen,Off,On;",
     "P1-;",
     "P1O[19],Consumer CRT Sync,On,Off;",
     "P1O[13:9],Analog Video H-Pos,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,-15,-14,-13,-12,-11,-10,-9,-8,-7,-6,-5,-4,-3,-2,-1;",
@@ -765,7 +764,10 @@ PGM pgm_inst(
 
     .mister_rtc(mister_rtc),
 
-    .sync_fix
+    .sync_fix,
+
+    .global_flip_x(flip_screen),
+    .global_flip_y(flip_screen)
 );
 
 assign CLK_VIDEO = clk_sys;
@@ -779,6 +781,7 @@ wire [4:0] hoffset        = status[13:9];
 wire [4:0] voffset        = status[18:14];
 wire       hscale_en      = status[20];
 wire [4:0] hscale         = status[25:21];
+wire       flip_screen    = status[26];
 
 wire       osd_pause      = status[38];
 wire       pause_dim      = ~status[39];

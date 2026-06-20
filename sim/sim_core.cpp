@@ -138,6 +138,10 @@ TickResult SimCore::TickOneCycle()
 {
     mTotalTicks++;
 
+    // Global screen-flip inputs, driven by the video window's "Flip X"/"Flip Y" checkboxes.
+    mTop->flip_x = mVideo->mFlipX ? 1 : 0;
+    mTop->flip_y = mVideo->mFlipY ? 1 : 0;
+
     mSDRAM->UpdateChannel64(0, mTop->sdr_addr, mTop->sdr_req, mTop->sdr_rw, mTop->sdr_be, mTop->sdr_data, &mTop->sdr_q, &mTop->sdr_ack);
     mVideo->Clock(mTop->ce_pixel != 0, mTop->hblank != 0, mTop->vblank != 0, mTop->red, mTop->green, mTop->blue);
 

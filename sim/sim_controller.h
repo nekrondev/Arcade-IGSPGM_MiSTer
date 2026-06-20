@@ -119,6 +119,12 @@ struct ScreenshotResult
     std::string mPath;
 };
 
+struct FlipResult
+{
+    bool mFlipX = false;
+    bool mFlipY = false;
+};
+
 struct GuiEntryState
 {
     uint32_t mIndex = 0;
@@ -287,6 +293,7 @@ class SimController
     ControllerResult<EmptyResult> StartAudioCapture(const std::string &filename);
     ControllerResult<EmptyResult> StopAudioCapture();
     ControllerResult<ScreenshotResult> SaveScreenshot(const std::string &path);
+    ControllerResult<FlipResult> SetFlip(bool flipX, bool flipY);
     ControllerResult<GuiStateResult> GetGuiState() const;
     ControllerResult<Ics2115DebugState> GetIcs2115DebugState() const;
     ControllerResult<EmptyResult> SetIcs2115VoiceState(uint32_t index, const Ics2115VoiceState &voice);

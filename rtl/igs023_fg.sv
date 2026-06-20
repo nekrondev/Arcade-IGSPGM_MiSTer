@@ -26,6 +26,8 @@ module IGS023_FG(
     input [8:0] x,
     input [7:0] y,
 
+    input global_flip_x,
+
     output [8:0] color_out,
 
     // VRAM interface
@@ -71,6 +73,8 @@ reg [4:0] palette;
 
 assign vram_addr = { vram_row_addr, tile_addr };
 
+wire [8:0] x_r = x + 9'd447;
+
 reg [31:0] color_buffer[64];
 reg [4:0]  palette_buffer[64];
 
@@ -86,10 +90,10 @@ always_ff @(posedge clk) begin
         reading_vram <= 1;
         read_state <= READ0;
         vram_row_addr <= { 2'b10, y[7:3] };
-        tile_addr <= {x[8:3], 2'b00};
+        tile_addr <= { global_flip_x ? x_r[8:3] : x[8:3], 2'b00 };
         read_counter <= 0;
         buffer_idx <= 0;
-        pixel_idx <= x[2:0];
+        pixel_idx <= global_flip_x ? ~x_r[2:0] : x[2:0];
         rom_req <= secondary_rom_req;
         first_read <= 1;
     end else if (reading_vram) begin
@@ -118,7 +122,7 @@ always_ff @(posedge clk) begin
             end
             READ3: begin
                 tile_attrib[7:0] <= vram_din;
-                tile_addr <= tile_addr + 1;
+                tile_addr <= global_flip_x ? (tile_addr - 8'd7) : (tile_addr + 8'd1);
                 first_read <= 0;
                 read_state <= first_read ? ROM_REQ : ROM_WAIT;
             end
@@ -142,7 +146,7 @@ always_ff @(posedge clk) begin
                     rom_address <= { 3'd0, tile_code, tile_attrib[7] ? ~y[2:0] : y[2:0], 2'd0 };
                     rom_req <= ~rom_req;
                     read_state <= READ0;
-                    flip_x <= tile_attrib[6];
+                    flip_x <= tile_attrib[6] ^ global_flip_x;
                     palette <= tile_attrib[5:1];
                 end
             end

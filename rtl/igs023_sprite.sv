@@ -28,6 +28,9 @@ module IGS023_Sprite(
 
     input dma_start,
 
+    input global_flip_x,
+    input global_flip_y,
+
     output [11:0] color_out,
 
     // DMA interface
@@ -73,6 +76,32 @@ begin
     bit [5:0] width32;
     width32 = { 1'b0, scale } + 6'd16;
     scaled_width = ({ 6'd0, width32 } * { 7'd0, width[5:1] } ) + ( width[0] ? { 7'd0, width32[5:1] } : 12'd0 );
+end
+endfunction
+
+function automatic [5:0] popcount32(input [31:0] v);
+    integer k;
+begin
+    popcount32 = 0;
+    for (k = 0; k < 32; k = k + 1) popcount32 = popcount32 + { 5'd0, v[k] };
+end
+endfunction
+
+// ugh, this is super complicated
+function automatic [9:0] scaled_height(input [4:0] scale, input [31:0] pat, input [8:0] height);
+    bit [4:0]  pper;      // set bits per full 32-line period = |scale-16|
+    bit [3:0]  full;      // full 32-line periods
+    bit [4:0]  rem;       // remaining source lines
+    bit [5:0]  prem;      // set bits among the first `rem` lines
+    bit [9:0] settotal;
+begin
+    pper = scale[4] ? (scale - 5'd16) : (5'd16 - scale);
+    full = height[8:5];
+    rem  = height[4:0];
+    prem = popcount32(pat & ((32'd1 << rem) - 32'd1));
+    settotal = ({ 6'd0, full } * { 5'd0, pper }) + { 4'd0, prem };
+    scaled_height = scale[4] ? ({ 1'd0, height } + settotal)
+                             : ({ 1'd0, height } - settotal + 10'd1);
 end
 endfunction
 
@@ -308,6 +337,7 @@ always_ff @(posedge clk) begin
     reg [31:0] tmp_addr32;
 
     reg tmp_1bit;
+    reg [11:0] tmp_scaled_w;
 
 
     if (reset) begin
@@ -329,27 +359,30 @@ always_ff @(posedge clk) begin
         if (spr_load) begin
             {spr_scale_x, spr_x} <= sprite_d0[sprite_index];
             {spr_scale_y, tmp_1bit, spr_y} <= sprite_d1[sprite_index];
-
             {spr_y_flip, spr_x_flip, spr_palette, spr_prio, spr_brom_addr[22:16]} <= sprite_d2[sprite_index][14:0];
             spr_brom_addr[15:0] <= sprite_d3[sprite_index];
-            
             {spr_width, spr_height} <= sprite_d4[sprite_index][14:0];
 
             spr <= sprite_state[sprite_index];
             spr_saved <= sprite_state[sprite_index];
-            spr_load_d <= 1;           
+            spr_load_d <= 1;
         end else if (spr_store) begin
             sprite_state[sprite_index] <= spr;
         end
 
-        if (spr_load_d) begin
-            // this stuff happens the next cycle after spr_load
-            if (spr_y_flip) begin
+        if (spr_load_d && !spr_load) begin
+            tmp_scaled_w = scaled_width(spr_scale_x, spr_width);
+
+            if (global_flip_x) spr_x <= 11'd448 - spr_x - tmp_scaled_w[10:0];
+            spr_x_flip <= spr_x_flip ^ global_flip_x;
+            spr_y_flip <= spr_y_flip ^ global_flip_y;
+
+            if (spr_y_flip ^ global_flip_y) begin
                 spr_brom_base_addr <= spr_brom_addr + 32'd3 + ({17'b0, spr_width} * {14'b0, spr_height});
             end else begin
                 spr_brom_base_addr <= spr_brom_addr;
             end
-            spr_scaled_width <= scaled_width(spr_scale_x, spr_width);
+            spr_scaled_width <= tmp_scaled_w;
             spr_x_scale_bits <= scale_pattern[spr_scale_x];
             spr_y_scale_bits <= scale_pattern[spr_scale_y];
         end
@@ -423,8 +456,9 @@ always_ff @(posedge clk) begin
                 spr.brom_offset <= 0;
                 brom_req <= ~brom_req;
                 tmp_x <= 0;
-                spr.screen_line <= spr_y;
                 spr.source_line <= 0;
+                spr.screen_line <= global_flip_y ? (10'd224 - spr_y - scaled_height(spr_scale_y, scale_pattern[spr_scale_y], spr_height))
+                                                 : spr_y;
                 dma_state <= PRESCAN_INITIAL_BROM_WAIT;
             end
 

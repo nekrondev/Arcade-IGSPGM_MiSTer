@@ -83,6 +83,9 @@ module PGM(
 
     input             sync_fix,
 
+    input             global_flip_x,
+    input             global_flip_y,
+
     input             pause,
 
     input             nvram_wr,
@@ -800,6 +803,9 @@ IGS023 #(.SS_IDX(SSIDX_IGS023)) igs023(
 
     .pause_req(pause | ss_pause),
     .pause_ack(paused),
+
+    .global_flip_x(global_flip_x),
+    .global_flip_y(global_flip_y),
 
     .ssbus(ssb[SSIDX_IGS023])
 );

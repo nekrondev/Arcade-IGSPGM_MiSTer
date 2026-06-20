@@ -66,6 +66,9 @@ module sim_top(
 
     input             sync_fix,
 
+    input             flip_x,   // driven from the video window "Flip X" checkbox
+    input             flip_y,   // driven from the video window "Flip Y" checkbox
+
     input             pause
 );
 
@@ -254,7 +257,10 @@ PGM pgm_inst(
     .ss_state_out(ss_state_out),
 
     .sync_fix(sync_fix),
-    
+
+    .global_flip_x(flip_x),
+    .global_flip_y(flip_y),
+
     .pause(pause),
 
     .nvram_wr(nvram_wr),

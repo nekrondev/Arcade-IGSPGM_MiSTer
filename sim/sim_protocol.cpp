@@ -1176,6 +1176,26 @@ std::string SimProtocol::HandleLine(const std::string &line)
         auto result = mController.SaveScreenshot(path);
         return SerializeJson(WrapControllerResult(id, result, JsonValue::Object({{"path", JsonValue::String(result.value.mPath)}})));
     }
+    if (method == "video.set_flip")
+    {
+        bool flipX = false;
+        bool flipY = false;
+        if (const JsonValue *fx = FindObjectField(params, "flip_x"))
+        {
+            if (!RequireBool(*fx, "flip_x", flipX, error))
+                return SerializeJson(MakeErrorResponse(id, "bad_request", error));
+        }
+        if (const JsonValue *fy = FindObjectField(params, "flip_y"))
+        {
+            if (!RequireBool(*fy, "flip_y", flipY, error))
+                return SerializeJson(MakeErrorResponse(id, "bad_request", error));
+        }
+        auto result = mController.SetFlip(flipX, flipY);
+        return SerializeJson(WrapControllerResult(id, result, JsonValue::Object({
+            {"flip_x", JsonValue::Bool(result.value.mFlipX)},
+            {"flip_y", JsonValue::Bool(result.value.mFlipY)},
+        })));
+    }
     if (method == "gui.get_state")
     {
         auto result = mController.GetGuiState();

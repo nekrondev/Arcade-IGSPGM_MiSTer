@@ -166,7 +166,7 @@ ControllerResult<EmptyResult> SimController::Initialize(bool headless)
     }
     else
     {
-        gSimCore.mVideo->Init(450, 224, ImguiGetRenderer());
+        gSimCore.mVideo->Init(448, 224, ImguiGetRenderer());
         gSimCore.mGfxCache->Init(ImguiGetRenderer(), gSimCore.Memory(MemoryRegion::PALETTE_RAM));
     }
 
@@ -827,6 +827,25 @@ ControllerResult<ScreenshotResult> SimController::SaveScreenshot(const std::stri
     ScreenshotResult result;
     result.mPath = path;
     return ControllerResult<ScreenshotResult>::Success(result);
+}
+
+ControllerResult<FlipResult> SimController::SetFlip(bool flipX, bool flipY)
+{
+    auto initResult = EnsureInitialized();
+    if (!initResult.ok)
+    {
+        return ControllerResult<FlipResult>::Failure(initResult.errorCode, initResult.errorMessage);
+    }
+
+    // The video window's checkboxes drive mTop->flip_x/flip_y each tick, so set these and
+    // the next Tick() applies them to the RTL global_flip_x/global_flip_y inputs.
+    gSimCore.mVideo->mFlipX = flipX;
+    gSimCore.mVideo->mFlipY = flipY;
+
+    FlipResult result;
+    result.mFlipX = flipX;
+    result.mFlipY = flipY;
+    return ControllerResult<FlipResult>::Success(result);
 }
 
 ControllerResult<GuiStateResult> SimController::GetGuiState() const

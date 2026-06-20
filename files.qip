@@ -58,14 +58,10 @@ set_global_assignment -name SYSTEMVERILOG_FILE ./rtl/ics2115/ics2115_osc.sv
 if (1) {
     set_global_assignment -name VERILOG_MACRO "USE_AUTO_SS=1"
     set_global_assignment -name SYSTEMVERILOG_FILE ./rtl/tv80_auto_ss.sv
-    set_global_assignment -name SYSTEMVERILOG_FILE ./rtl/jt10_auto_ss.sv
 } else {
     set_global_assignment -name VERILOG_FILE ./rtl/tv80/tv80s.v
     set_global_assignment -name VERILOG_FILE ./rtl/tv80/tv80_alu.v
     set_global_assignment -name VERILOG_FILE ./rtl/tv80/tv80_reg.v
     set_global_assignment -name VERILOG_FILE ./rtl/tv80/tv80_core.v
     set_global_assignment -name VERILOG_FILE ./rtl/tv80/tv80_mcode.v
-
-    set_global_assignment -name QIP_FILE rtl/jt12/target/quartus/jt10.qip
-    set_global_assignment -name VERILOG_FILE ./rtl/jt12/hdl/jt12_reg_ch.v
 }

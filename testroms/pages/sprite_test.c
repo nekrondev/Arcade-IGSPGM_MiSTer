@@ -11,6 +11,13 @@
 static uint16_t frame_count = 0;
 static uint16_t zoom[2];
 
+static void block_at(u8 x, u8 y, u8 color)
+{
+    IGS023Tile *tile = text_get_tile(x, y);
+    tile->code = 0x20;
+    tile->color = color;
+}
+
 static void init()
 {
     igs023_init();
@@ -92,6 +99,7 @@ static void update()
     text_cursor(3, 2);
     textf("VBL: %05X  FRAME: %05X\n", vblank_count, frame_count);
 
+    block_at(20, 0, 2);
 
     gui_begin(3, 4);
     bool changed = gui_u8("MODE", &mode, 0, 6);

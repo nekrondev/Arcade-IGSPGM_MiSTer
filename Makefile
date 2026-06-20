@@ -81,9 +81,6 @@ picorom/%:
 
 
 
-rtl/jt10_auto_ss.sv:
-	$(PYTHON) util/state_module.py --generate-csv docs/jt10_mapping.csv jt10 rtl/jt10_auto_ss.sv rtl/jt12/jt49/hdl/*.v rtl/jt12/hdl/adpcm/*.v rtl/jt12/hdl/*.v rtl/jt12/hdl/mixer/*.v
-
 rtl/tv80_auto_ss.sv:
 	$(PYTHON) util/state_module.py --generate-csv docs/tv80_mapping.csv tv80s rtl/tv80_auto_ss.sv rtl/tv80/*.v
 
@@ -100,4 +97,4 @@ releases:
 releases.patch:
 	diff -ruN -x "*.rbf" -x ".DS_Store" releases_clean releases > releases.patch || true
 
-.PHONY: sim sim/run sim/test mister/test mister debug picorom rtl/jt10_auto_ss.sv rtl/tv80_auto_ss.sv releases releases_clean releases.patch
+.PHONY: sim sim/run sim/test mister/test mister debug picorom rtl/tv80_auto_ss.sv releases releases_clean releases.patch

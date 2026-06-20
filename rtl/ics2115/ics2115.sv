@@ -99,8 +99,16 @@ module ics2115
 
     logic [31:0] osc_irq_en;
     logic [31:0] osc_irq_pending;
+    // Per-voice "reached its end via a real engine event" flag (one-shot done).
+    // Set on the osc_irq_osc end pulse, cleared when the voice is not done
+    // (restart/playing).  Drives the osc-IRQ LEVEL re-assert — using a real end
+    // event, NOT osc_ctl[OSC_DONE] (which key-off also sets), per hardware.
+    logic [31:0] osc_ended;
     logic [31:0] vol_irq_en;
     logic [31:0] vol_irq_pending;
+    // Per-voice "vol envelope reached its end via a real event" flag — the vol
+    // analogue of osc_ended (hardware: vol IRQ is the same re-asserting level).
+    logic [31:0] vol_ended;
 
     localparam int VOICE_SS_WORDS = NUM_VOICES * 8;
     localparam int SS_STATE_BASE = VOICE_SS_WORDS;
@@ -117,7 +125,9 @@ module ics2115
     localparam int SS_WORD_OSC_IRQ_PENDING = SS_STATE_BASE + 10;
     localparam int SS_WORD_VOL_IRQ_EN = SS_STATE_BASE + 11;
     localparam int SS_WORD_VOL_IRQ_PENDING = SS_STATE_BASE + 12;
-    localparam int SS_WORD_COUNT = SS_STATE_BASE + 13;
+    localparam int SS_WORD_OSC_ENDED = SS_STATE_BASE + 13;
+    localparam int SS_WORD_VOL_ENDED = SS_STATE_BASE + 14;
+    localparam int SS_WORD_COUNT = SS_STATE_BASE + 15;
 
     typedef enum logic [2:0] {
         SS_IDLE = 3'd0,
@@ -264,7 +274,6 @@ module ics2115
     // Timer INT event latches: set on fire (when 0x43-enabled), cleared by a
     // 0x43 read; separate from the persistent pending bits.
     logic [1:0]  timer_int;
-    logic        stat43_rd_clear;
 
     // =========================================================================
     // Tables instance
@@ -613,9 +622,13 @@ module ics2115
         // master IRQ/run gate — with them clear, NEITHER timer NOR voice IRQs
         // reach the host (delivery only at 0x4D=0x05).  Timer counting is
         // already gated in the counter block; gate the voice term here too.
+        // Hardware (2026-06-18/19): both the osc AND vol INT lines follow the
+        // LATCH (osc/vol_irq_pending), NOT the per-voice enable — clearing the
+        // enable without an IRQV read still storms; the enable gates the
+        // SET/re-assert (in the seq block), not the line.
         irq_on = |timer_int
               | (sys_ctl[0] & sys_ctl[2] & (|irq_enabled) &
-                 |((osc_irq_en & osc_irq_pending) | (vol_irq_en & vol_irq_pending)));
+                 |(osc_irq_pending | vol_irq_pending));
     end
 
     assign host_irq = irq_on;
@@ -814,7 +827,9 @@ module ics2115
     end
 
     // IRQV consume pulse: a high-byte read of 0x0F (or its 0x2F mirror).
-    wire irqv_consume = host_rd_done_pulse && host_addr == 2'd3 &&
+    // Hardware (2026-06-18 voice_probe): an IRQV read on EITHER byte consumes the
+    // reported voice's pend (was high-byte only).
+    wire irqv_consume = host_rd_done_pulse && (host_addr == 2'd2 || host_addr == 2'd3) &&
                         reg_select < 8'h40 && reg_select[4:0] == 5'h0F &&
                         irqv_rr_found;
 
@@ -827,8 +842,11 @@ module ics2115
     always_comb begin
         timer_irq_clear_next[0] = 1'b0;
         timer_irq_clear_next[1] = 1'b0;
-        if (host_rd_done_pulse && host_addr == 2'd3 &&
-            prev_rd_was_lo && prev_rd_reg == reg_select) begin
+        // Hardware (2026-06-18): reading the timer
+        // preset 0x40/0x41 on EITHER byte acks the timer; nothing else does.
+        // (Was: required a 16-bit lo-then-hi read, and reading 0x43 cleared it
+        // -- both wrong; a game acking with a single 0x40 read storms/hangs.)
+        if (host_rd_done_pulse && (host_addr == 2'd2 || host_addr == 2'd3)) begin
             if (reg_select == 8'h40)
                 timer_irq_clear_next[0] = 1'b1;
             else if (reg_select == 8'h41)
@@ -836,10 +854,7 @@ module ics2115
         end
     end
 
-    // Reading 0x43 (either byte) drops the timer INT latches.
-    assign stat43_rd_clear = host_rd_done_pulse &&
-                             (host_addr == 2'd2 || host_addr == 2'd3) &&
-                             reg_select == 8'h43;
+    // (Reading 0x43 does NOT ack the timer on hardware -- matrix 43-C.)
 
     always_comb begin
         case (host_addr)
@@ -1035,6 +1050,8 @@ module ics2115
                                 SS_WORD_OSC_IRQ_PENDING: ssbus.read_response(SS_IDX, {32'd0, osc_irq_pending});
                                 SS_WORD_VOL_IRQ_EN: ssbus.read_response(SS_IDX, {32'd0, vol_irq_en});
                                 SS_WORD_VOL_IRQ_PENDING: ssbus.read_response(SS_IDX, {32'd0, vol_irq_pending});
+                                SS_WORD_OSC_ENDED: ssbus.read_response(SS_IDX, {32'd0, osc_ended});
+                                SS_WORD_VOL_ENDED: ssbus.read_response(SS_IDX, {32'd0, vol_ended});
                                 default: ssbus.read_response(SS_IDX, 64'd0);
                             endcase
                             ss_state <= SS_WAIT_IDLE;
@@ -1105,6 +1122,8 @@ module ics2115
             irqv_ram_clear_vol <= 1'b0;
             osc_irq_en <= 32'd0;
             osc_irq_pending <= 32'd0;
+            osc_ended <= 32'd0;
+            vol_ended <= 32'd0;
             vol_irq_en <= 32'd0;
             vol_irq_pending <= 32'd0;
             for (int i = 0; i < 2; i++) begin
@@ -1167,6 +1186,8 @@ module ics2115
                     SS_WORD_OSC_IRQ_PENDING: osc_irq_pending <= ss_state_write_data;
                     SS_WORD_VOL_IRQ_EN: vol_irq_en <= ss_state_write_data;
                     SS_WORD_VOL_IRQ_PENDING: vol_irq_pending <= ss_state_write_data;
+                    SS_WORD_OSC_ENDED: osc_ended <= ss_state_write_data;
+                    SS_WORD_VOL_ENDED: vol_ended <= ss_state_write_data;
                     default: ;
                 endcase
             end else if (!ss_busy_local) begin
@@ -1218,22 +1239,76 @@ module ics2115
             // RAM copy via the irqv_ram_clear path).
             if (seq_voice_wr) begin
                 osc_irq_en[seq_wr_idx] <= seq_wr_data.osc_conf[OSC_IRQ];
-                // Set pends from the engine's EVENT PULSES, not the RAM bit7
-                // echo: a write-back of stale stored bit7 racing an IRQV
-                // consume would re-assert the INT forever (voice retrigger
-                // loop — stuck repeating notes in game music).
-                if (osc_irq_osc)
+                // Track "reached its end via a real engine event" (one-shot done
+                // -> osc_irq_osc with the voice now DONE; NOT a loop boundary,
+                // NOT a host key-off which also sets osc_ctl[OSC_DONE]).  Cleared
+                // once the voice is not done (restart/playing).
+                if (osc_irq_osc && seq_wr_data.osc_ctl[OSC_DONE])
+                    osc_ended[seq_wr_idx] <= 1'b1;
+                else if (!seq_wr_data.osc_ctl[OSC_DONE])
+                    osc_ended[seq_wr_idx] <= 1'b0;
+                // osc IRQ is a re-asserting LEVEL (hardware): the end-event pulse
+                // sets it, AND it keeps re-asserting while the voice stays ended
+                // AND IRQ-enabled (osc_conf bit5).  Driven by the live enable +
+                // the real end event (osc_ended), NOT the stale RAM bit7 echo —
+                // so once the host clears the enable the re-assert stops and the
+                // next IRQV consume clears it for good (no stuck notes).  An IRQV
+                // consume the same cycle wins the race (clear below); the next
+                // seq pass re-asserts if still ended+enabled = the hardware
+                // "clear-enable + IRQV" ack, ~2 passes to beat the write race.
+                if (osc_irq_osc ||
+                    (osc_ended[seq_wr_idx] && seq_wr_data.osc_conf[OSC_IRQ]))
                     osc_irq_pending[seq_wr_idx] <= 1'b1;
                 vol_irq_en[seq_wr_idx] <= seq_wr_data.vol_ctrl[VOL_IRQ];
-                if (osc_irq_vol)
+                // vol IRQ is the same re-asserting LEVEL as osc (hardware
+                // 2026-06-19): track the real envelope-end event in vol_ended
+                // (set when osc_irq_vol fires with the envelope now VOL_DONE — a
+                // non-loop completion; cleared while not-done), and re-assert
+                // vol_irq_pending while (vol_ended & VOL_IRQ enable).
+                if (osc_irq_vol && seq_wr_data.vol_ctrl[VOL_DONE])
+                    vol_ended[seq_wr_idx] <= 1'b1;
+                else if (!seq_wr_data.vol_ctrl[VOL_DONE])
+                    vol_ended[seq_wr_idx] <= 1'b0;
+                if (osc_irq_vol ||
+                    (vol_ended[seq_wr_idx] && seq_wr_data.vol_ctrl[VOL_IRQ]))
                     vol_irq_pending[seq_wr_idx] <= 1'b1;
             end
 
             if (host_voice_wr_apply) begin
                 osc_irq_en[host_voice_wr_voice] <= host_voice_wr_data.osc_conf[OSC_IRQ];
+                // A host key-on (osc_ctl write leaving the voice not-done)
+                // restarts the voice -> clear the "ended" state so it no longer
+                // re-asserts.  Hardware: restarting stops the storm, whereas a
+                // key-off or an osc_conf write does NOT (matrix modes 8/12) — so
+                // only gate on osc_ctl DONE here, not on osc_conf.
+                if (!host_voice_wr_data.osc_ctl[OSC_DONE])
+                    osc_ended[host_voice_wr_voice] <= 1'b0;
+                // A host write to osc_acc (0x0A/0x0B) REPOSITIONS the voice off
+                // its previous end -> clear the sticky "ended" state.  The engine
+                // never writes osc_acc for a done voice (it skips done voices), so
+                // this only fires on a host reposition, never during playback; a
+                // genuinely-done voice left untouched (matrix mode 12) keeps
+                // storming.  Fixes the phantom osc IRQ when a game re-points a
+                // reused voice (new osc_acc) and enables the IRQ BEFORE the
+                // key-on: the stale osc_ended would otherwise re-assert in that
+                // window before the key-on clears it.
+                if (host_voice_wr_reg == 8'h0A || host_voice_wr_reg == 8'h0B)
+                    osc_ended[host_voice_wr_voice] <= 1'b0;
+                // Host osc pend requires bit7 (PEND) AND bit5 (IRQ enable) together
+                // -- hardware RE (matrix 00-C): 0xA0 latches a pend, 0x80 alone is a
+                // no-op.  Gating on bit7 alone let a stale bit7 in an osc_conf write
+                // spuriously latch a pend.
                 osc_irq_pending[host_voice_wr_voice] <= osc_irq_pending[host_voice_wr_voice]
                     | (host_voice_wr_data.osc_conf[OSC_IRQ_PEND] & host_voice_wr_data.osc_conf[OSC_IRQ]);
                 vol_irq_en[host_voice_wr_voice] <= host_voice_wr_data.vol_ctrl[VOL_IRQ];
+                // A host vol_ctrl write that clears VOL_DONE restarts the envelope
+                // -> clear vol_ended (the vol analogue of the osc key-on clear).
+                if (!host_voice_wr_data.vol_ctrl[VOL_DONE])
+                    vol_ended[host_voice_wr_voice] <= 1'b0;
+                // vol analogue: a host write to vol_acc (0x09) reloads the
+                // envelope position -> clear vol_ended (same reposition logic).
+                if (host_voice_wr_reg == 8'h09)
+                    vol_ended[host_voice_wr_voice] <= 1'b0;
                 // vol pends are NOT host-settable (hardware: VCtl bit7 writes
                 // latch nothing; only real envelope events pend)
             end
@@ -1375,14 +1450,16 @@ module ics2115
             timer_irq_clear[0] <= timer_irq_clear_next[0];
             timer_irq_clear[1] <= timer_irq_clear_next[1];
 
-            if (timer_irq_clear[0])
+            // A 0x40/0x41 read (either byte) acks the timer: clear BOTH the raw
+            // pending (0x43-register bit) and the enable-gated INT latch (line).
+            if (timer_irq_clear[0]) begin
                 irq_pending[0] <= 1'b0;
-            if (timer_irq_clear[1])
+                timer_int[0]   <= 1'b0;
+            end
+            if (timer_irq_clear[1]) begin
                 irq_pending[1] <= 1'b0;
-
-            // ── Timer INT latch clear (0x43 read) ──
-            if (stat43_rd_clear)
-                timer_int <= 2'b00;
+                timer_int[1]   <= 1'b0;
+            end
 
             // ── Timer counter logic ──
             // Hardware (T-SYS 2026-06-13): timer counting requires 0x4D bits 0

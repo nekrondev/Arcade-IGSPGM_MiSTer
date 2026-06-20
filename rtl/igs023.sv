@@ -85,6 +85,9 @@ module IGS023 #(parameter SS_IDX=-1) (
     input      pause_req,
     output reg pause_ack,
 
+    input      global_flip_x,
+    input      global_flip_y,
+
     ssbus_if.slave ssbus
 );
 
@@ -156,6 +159,7 @@ reg [9:0] hcnt;
 
 // 0 is the top/right of the screen
 wire [10:0] logical_vcnt = { 2'b0, vcnt } - 40;
+wire [10:0] vcnt_eff = global_flip_y ? (11'd221 - logical_vcnt) : logical_vcnt;
 
 wire hsync = (hcnt >= 63 && hcnt < (63 + 63));
 wire hblank = hcnt < 192;
@@ -179,9 +183,9 @@ always @(posedge clk) begin
         end
 
         if (hcnt == 638 && vcnt > 38 && vcnt < 263) begin
-            fg_read_y <= logical_vcnt[7:0] + fg_y[7:0] + 8'd1;
+            fg_read_y <= vcnt_eff[7:0] + fg_y[7:0] + 8'd1;
             fg_start_read <= 1;
-            bg_read_y <= logical_vcnt[10:0] + bg_y[10:0] + 11'd1;
+            bg_read_y <= vcnt_eff[10:0] + bg_y[10:0] + 11'd1;
         end
 
         prev_fg_fpga_vram_master <= fg_fpga_vram_master;
@@ -217,6 +221,7 @@ IGS023_FG fg(
     .scan_active(~(vblank | hblank)),
     .x(fg_x[8:0]),
     .y(fg_read_y),
+    .global_flip_x(global_flip_x),
     .color_out(fg_color),
     .vram_addr(fg_vram_addr),
     .vram_din(vram_din),
@@ -237,7 +242,8 @@ IGS023_BG bg(
     .scan_active(~(vblank | hblank)),
     .x(bg_x[10:0]),
     .y(bg_read_y),
-    .screen_y(logical_vcnt[7:0]),
+    .screen_y(vcnt_eff[7:0]),
+    .global_flip_x(global_flip_x),
     .color_out(bg_color),
     .scale_bits_x({zoom_table[1], zoom_table[0]}),
     .scale_bits_y({zoom_table[1], zoom_table[0]}),
@@ -264,6 +270,8 @@ IGS023_Sprite sprite(
 
     .reset(reset),
     .dma_start(dma_start),
+    .global_flip_x(global_flip_x),
+    .global_flip_y(global_flip_y),
     .color_out(sprite_color),
     .cpu_br_n,
     .cpu_bgack_n,
