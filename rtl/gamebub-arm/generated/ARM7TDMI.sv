@@ -100,15 +100,6 @@ module ARM7TDMI(
   wire              io_saveReq_0 = io_saveReq;
   wire              io_mem_PROT_privileged_0 = 1'h0;
   wire              control_memProt_privileged = 1'h0;
-  wire [4:0]        offset = 5'h0;
-  wire [4:0]        offset_1 = 5'h0;
-  wire [4:0]        offset_2 = 5'h0;
-  wire [4:0]        offset_3 = 5'h0;
-  wire [4:0]        offset_4 = 5'h0;
-  wire [4:0]        offset_5 = 5'h0;
-  wire [4:0]        offset_6 = 5'h0;
-  wire [4:0]        offset_7 = 5'h0;
-  wire [4:0]        offset_15 = 5'h0;
   wire              control_memWrite;
   wire [1:0]        control_memWidth;
   wire              control_memProt_data;
@@ -127,47 +118,56 @@ module ARM7TDMI(
   wire [1:0]        io_mem_SIZE_0 = control_memWidth;
   wire              io_mem_PROT_data_0 = control_memProt_data;
   wire              io_mem_LOCK_0 = control_memLock;
-  reg  [31:0]       registers_0;
-  wire [31:0]       io_debug_registers_0_0 = registers_0;
-  reg  [31:0]       registers_1;
-  wire [31:0]       io_debug_registers_1_0 = registers_1;
-  reg  [31:0]       registers_2;
-  wire [31:0]       io_debug_registers_2_0 = registers_2;
-  reg  [31:0]       registers_3;
-  wire [31:0]       io_debug_registers_3_0 = registers_3;
-  reg  [31:0]       registers_4;
-  wire [31:0]       io_debug_registers_4_0 = registers_4;
-  reg  [31:0]       registers_5;
-  wire [31:0]       io_debug_registers_5_0 = registers_5;
-  reg  [31:0]       registers_6;
-  wire [31:0]       io_debug_registers_6_0 = registers_6;
-  reg  [31:0]       registers_7;
-  wire [31:0]       io_debug_registers_7_0 = registers_7;
-  reg  [31:0]       registers_8;
-  reg  [31:0]       registers_9;
-  reg  [31:0]       registers_10;
-  reg  [31:0]       registers_11;
-  reg  [31:0]       registers_12;
-  reg  [31:0]       registers_13;
-  reg  [31:0]       registers_14;
-  reg  [31:0]       registers_15;
-  wire [31:0]       io_debug_registers_15_0 = registers_15;
-  wire [31:0]       pcBus = registers_15;
-  reg  [31:0]       registers_16;
-  reg  [31:0]       registers_17;
-  reg  [31:0]       registers_18;
-  reg  [31:0]       registers_19;
-  reg  [31:0]       registers_20;
-  reg  [31:0]       registers_21;
-  reg  [31:0]       registers_22;
-  reg  [31:0]       registers_23;
-  reg  [31:0]       registers_24;
-  reg  [31:0]       registers_25;
-  reg  [31:0]       registers_26;
-  reg  [31:0]       registers_27;
-  reg  [31:0]       registers_28;
-  reg  [31:0]       registers_29;
-  reg  [31:0]       registers_30;
+  reg  [31:0]       active_0;
+  wire [31:0]       io_debug_registers_0_0 = active_0;
+  reg  [31:0]       active_1;
+  wire [31:0]       io_debug_registers_1_0 = active_1;
+  reg  [31:0]       active_2;
+  wire [31:0]       io_debug_registers_2_0 = active_2;
+  reg  [31:0]       active_3;
+  wire [31:0]       io_debug_registers_3_0 = active_3;
+  reg  [31:0]       active_4;
+  wire [31:0]       io_debug_registers_4_0 = active_4;
+  reg  [31:0]       active_5;
+  wire [31:0]       io_debug_registers_5_0 = active_5;
+  reg  [31:0]       active_6;
+  wire [31:0]       io_debug_registers_6_0 = active_6;
+  reg  [31:0]       active_7;
+  wire [31:0]       io_debug_registers_7_0 = active_7;
+  reg  [31:0]       active_8;
+  wire [31:0]       io_debug_registers_8_0 = active_8;
+  reg  [31:0]       active_9;
+  wire [31:0]       io_debug_registers_9_0 = active_9;
+  reg  [31:0]       active_10;
+  wire [31:0]       io_debug_registers_10_0 = active_10;
+  reg  [31:0]       active_11;
+  wire [31:0]       io_debug_registers_11_0 = active_11;
+  reg  [31:0]       active_12;
+  wire [31:0]       io_debug_registers_12_0 = active_12;
+  reg  [31:0]       active_13;
+  wire [31:0]       io_debug_registers_13_0 = active_13;
+  reg  [31:0]       active_14;
+  wire [31:0]       io_debug_registers_14_0 = active_14;
+  reg  [31:0]       active_15;
+  wire [31:0]       io_debug_registers_15_0 = active_15;
+  wire [31:0]       pcBus = active_15;
+  reg  [31:0]       bank_r13_0;
+  reg  [31:0]       bank_r13_1;
+  reg  [31:0]       bank_r13_2;
+  reg  [31:0]       bank_r13_3;
+  reg  [31:0]       bank_r13_4;
+  reg  [31:0]       bank_r13_5;
+  reg  [31:0]       bank_r14_0;
+  reg  [31:0]       bank_r14_1;
+  reg  [31:0]       bank_r14_2;
+  reg  [31:0]       bank_r14_3;
+  reg  [31:0]       bank_r14_4;
+  reg  [31:0]       bank_r14_5;
+  reg  [31:0]       bank_r8_12_0;
+  reg  [31:0]       bank_r8_12_1;
+  reg  [31:0]       bank_r8_12_2;
+  reg  [31:0]       bank_r8_12_3;
+  reg  [31:0]       bank_r8_12_4;
   reg               cpsr_cond_n;
   wire              cpsrBus_cond_n = cpsr_cond_n;
   reg               cpsr_cond_z;
@@ -241,128 +241,63 @@ module ARM7TDMI(
            : control_regBankMode == 5'h1B ? 2'h2 : {1'h0, control_regBankMode == 5'h17}};
   wire              modeHasSpsr = control_regBankMode != 5'h10 & control_regBankMode != 5'h1F;
   wire              modePrivileged = cpsr_mode != 5'h10;
+  wire [15:0][31:0] _GEN =
+    {{active_15},
+     {active_14},
+     {active_13},
+     {active_12},
+     {active_11},
+     {active_10},
+     {active_9},
+     {active_8},
+     {active_7},
+     {active_6},
+     {active_5},
+     {active_4},
+     {active_3},
+     {active_2},
+     {active_1},
+     {active_0}};
   wire [3:0]        control_regReadA;
-  wire [31:0][31:0] _GEN =
-    {{registers_0},
-     {registers_30},
-     {registers_29},
-     {registers_28},
-     {registers_27},
-     {registers_26},
-     {registers_25},
-     {registers_24},
-     {registers_23},
-     {registers_22},
-     {registers_21},
-     {registers_20},
-     {registers_19},
-     {registers_18},
-     {registers_17},
-     {registers_16},
-     {registers_15},
-     {registers_14},
-     {registers_13},
-     {registers_12},
-     {registers_11},
-     {registers_10},
-     {registers_9},
-     {registers_8},
-     {registers_7},
-     {registers_6},
-     {registers_5},
-     {registers_4},
-     {registers_3},
-     {registers_2},
-     {registers_1},
-     {registers_0}};
-  wire [31:0]       _GEN_0 = _GEN[{1'h0, control_regReadA}];
-  wire [31:0]       aBus_fiqBank =
-    control_regReadA == 4'hE
-      ? registers_30
-      : control_regReadA == 4'hD
-          ? registers_29
-          : control_regReadA == 4'hC
-              ? registers_28
-              : control_regReadA == 4'hB
-                  ? registers_27
-                  : control_regReadA == 4'hA
-                      ? registers_26
-                      : control_regReadA == 4'h9 ? registers_25 : control_regReadA == 4'h8 ? registers_24 : _GEN_0;
-  wire              aBus_hi = control_regReadA == 4'hE;
-  wire [31:0]       aBus_shadow =
-    cpsr_mode == 5'h12
-      ? (aBus_hi ? registers_23 : registers_22)
-      : cpsr_mode == 5'h1B
-          ? (aBus_hi ? registers_21 : registers_20)
-          : cpsr_mode == 5'h17
-              ? (aBus_hi ? registers_19 : registers_18)
-              : cpsr_mode == 5'h13 ? (aBus_hi ? registers_17 : registers_16) : _GEN_0;
-  wire              aBus_is1314 = control_regReadA == 4'hD | aBus_hi;
-  wire              _bBus_fiqHit_T = cpsr_mode == 5'h11;
-  wire              aBus_fiqHit = _bBus_fiqHit_T & control_regReadA[3] & control_regReadA != 4'hF;
-  wire [31:0]       aBus = aBus_fiqHit ? aBus_fiqBank : aBus_is1314 ? aBus_shadow : _GEN_0;
+  wire [31:0]       aBus = _GEN[control_regReadA];
   wire [3:0]        control_regReadB;
-  wire [31:0]       _GEN_1 = _GEN[{1'h0, control_regReadB}];
-  wire [31:0]       bBus_fiqBank =
-    control_regReadB == 4'hE
-      ? registers_30
-      : control_regReadB == 4'hD
-          ? registers_29
-          : control_regReadB == 4'hC
-              ? registers_28
-              : control_regReadB == 4'hB
-                  ? registers_27
-                  : control_regReadB == 4'hA
-                      ? registers_26
-                      : control_regReadB == 4'h9 ? registers_25 : control_regReadB == 4'h8 ? registers_24 : _GEN_1;
-  wire              bBus_hi = control_regReadB == 4'hE;
-  wire [31:0]       bBus_shadow =
-    cpsr_mode == 5'h12
-      ? (bBus_hi ? registers_23 : registers_22)
-      : cpsr_mode == 5'h1B
-          ? (bBus_hi ? registers_21 : registers_20)
-          : cpsr_mode == 5'h17
-              ? (bBus_hi ? registers_19 : registers_18)
-              : cpsr_mode == 5'h13 ? (bBus_hi ? registers_17 : registers_16) : _GEN_1;
-  wire              bBus_is1314 = control_regReadB == 4'hD | bBus_hi;
-  wire              bBus_fiqHit = _bBus_fiqHit_T & control_regReadB[3] & control_regReadB != 4'hF;
-  wire [1:0]        _GEN_2 = {cpsr_cond_c, cpsr_cond_v};
+  wire [1:0]        _GEN_0 = {cpsr_cond_c, cpsr_cond_v};
   wire [1:0]        bBus_lo;
-  assign bBus_lo = _GEN_2;
+  assign bBus_lo = _GEN_0;
   wire [1:0]        bBus_lo_4;
-  assign bBus_lo_4 = _GEN_2;
+  assign bBus_lo_4 = _GEN_0;
   wire [1:0]        io_state_readData_lo;
-  assign io_state_readData_lo = _GEN_2;
+  assign io_state_readData_lo = _GEN_0;
   wire [1:0]        io_debug_cpsr_lo;
-  assign io_debug_cpsr_lo = _GEN_2;
+  assign io_debug_cpsr_lo = _GEN_0;
   wire [1:0]        lo;
-  assign lo = _GEN_2;
-  wire [1:0]        _GEN_3 = {cpsr_cond_n, cpsr_cond_z};
-  wire [1:0]        bBus_hi_1;
-  assign bBus_hi_1 = _GEN_3;
-  wire [1:0]        bBus_hi_5;
-  assign bBus_hi_5 = _GEN_3;
+  assign lo = _GEN_0;
+  wire [1:0]        _GEN_1 = {cpsr_cond_n, cpsr_cond_z};
+  wire [1:0]        bBus_hi;
+  assign bBus_hi = _GEN_1;
+  wire [1:0]        bBus_hi_4;
+  assign bBus_hi_4 = _GEN_1;
   wire [1:0]        io_state_readData_hi;
-  assign io_state_readData_hi = _GEN_3;
+  assign io_state_readData_hi = _GEN_1;
   wire [1:0]        io_debug_cpsr_hi;
-  assign io_debug_cpsr_hi = _GEN_3;
+  assign io_debug_cpsr_hi = _GEN_1;
   wire [1:0]        hi;
-  assign hi = _GEN_3;
-  wire [1:0]        _GEN_4 = {cpsr_fiqDisable, cpsr_thumb};
+  assign hi = _GEN_1;
+  wire [1:0]        _GEN_2 = {cpsr_fiqDisable, cpsr_thumb};
   wire [1:0]        bBus_lo_hi;
-  assign bBus_lo_hi = _GEN_4;
+  assign bBus_lo_hi = _GEN_2;
   wire [1:0]        bBus_lo_hi_2;
-  assign bBus_lo_hi_2 = _GEN_4;
+  assign bBus_lo_hi_2 = _GEN_2;
   wire [1:0]        io_state_readData_lo_hi;
-  assign io_state_readData_lo_hi = _GEN_4;
+  assign io_state_readData_lo_hi = _GEN_2;
   wire [1:0]        io_debug_cpsr_lo_hi;
-  assign io_debug_cpsr_lo_hi = _GEN_4;
+  assign io_debug_cpsr_lo_hi = _GEN_2;
   wire [1:0]        lo_hi;
-  assign lo_hi = _GEN_4;
+  assign lo_hi = _GEN_2;
   wire [6:0]        bBus_lo_1 = {bBus_lo_hi, cpsr_mode};
-  wire [23:0]       bBus_hi_hi = {bBus_hi_1, bBus_lo, cpsr_padding};
-  wire [24:0]       bBus_hi_2 = {bBus_hi_hi, cpsr_irqDisable};
-  wire [7:0]        _GEN_5 =
+  wire [23:0]       bBus_hi_hi = {bBus_hi, bBus_lo, cpsr_padding};
+  wire [24:0]       bBus_hi_1 = {bBus_hi_hi, cpsr_irqDisable};
+  wire [7:0]        _GEN_3 =
     {{spsrVec_0_cond_n},
      {spsrVec_0_cond_n},
      {spsrVec_0_cond_n},
@@ -371,7 +306,7 @@ module ARM7TDMI(
      {spsrVec_2_cond_n},
      {spsrVec_1_cond_n},
      {spsrVec_0_cond_n}};
-  wire [7:0]        _GEN_6 =
+  wire [7:0]        _GEN_4 =
     {{spsrVec_0_cond_z},
      {spsrVec_0_cond_z},
      {spsrVec_0_cond_z},
@@ -380,7 +315,7 @@ module ARM7TDMI(
      {spsrVec_2_cond_z},
      {spsrVec_1_cond_z},
      {spsrVec_0_cond_z}};
-  wire [7:0]        _GEN_7 =
+  wire [7:0]        _GEN_5 =
     {{spsrVec_0_cond_c},
      {spsrVec_0_cond_c},
      {spsrVec_0_cond_c},
@@ -389,7 +324,7 @@ module ARM7TDMI(
      {spsrVec_2_cond_c},
      {spsrVec_1_cond_c},
      {spsrVec_0_cond_c}};
-  wire [7:0]        _GEN_8 =
+  wire [7:0]        _GEN_6 =
     {{spsrVec_0_cond_v},
      {spsrVec_0_cond_v},
      {spsrVec_0_cond_v},
@@ -398,7 +333,7 @@ module ARM7TDMI(
      {spsrVec_2_cond_v},
      {spsrVec_1_cond_v},
      {spsrVec_0_cond_v}};
-  wire [7:0][19:0]  _GEN_9 =
+  wire [7:0][19:0]  _GEN_7 =
     {{spsrVec_0_padding},
      {spsrVec_0_padding},
      {spsrVec_0_padding},
@@ -407,7 +342,7 @@ module ARM7TDMI(
      {spsrVec_2_padding},
      {spsrVec_1_padding},
      {spsrVec_0_padding}};
-  wire [7:0]        _GEN_10 =
+  wire [7:0]        _GEN_8 =
     {{spsrVec_0_irqDisable},
      {spsrVec_0_irqDisable},
      {spsrVec_0_irqDisable},
@@ -416,7 +351,7 @@ module ARM7TDMI(
      {spsrVec_2_irqDisable},
      {spsrVec_1_irqDisable},
      {spsrVec_0_irqDisable}};
-  wire [7:0]        _GEN_11 =
+  wire [7:0]        _GEN_9 =
     {{spsrVec_0_fiqDisable},
      {spsrVec_0_fiqDisable},
      {spsrVec_0_fiqDisable},
@@ -425,7 +360,7 @@ module ARM7TDMI(
      {spsrVec_2_fiqDisable},
      {spsrVec_1_fiqDisable},
      {spsrVec_0_fiqDisable}};
-  wire [7:0]        _GEN_12 =
+  wire [7:0]        _GEN_10 =
     {{spsrVec_0_thumb},
      {spsrVec_0_thumb},
      {spsrVec_0_thumb},
@@ -434,7 +369,7 @@ module ARM7TDMI(
      {spsrVec_2_thumb},
      {spsrVec_1_thumb},
      {spsrVec_0_thumb}};
-  wire [7:0][4:0]   _GEN_13 =
+  wire [7:0][4:0]   _GEN_11 =
     {{spsrVec_0_mode},
      {spsrVec_0_mode},
      {spsrVec_0_mode},
@@ -443,55 +378,47 @@ module ARM7TDMI(
      {spsrVec_2_mode},
      {spsrVec_1_mode},
      {spsrVec_0_mode}};
-  wire [1:0]        bBus_lo_2 = {_GEN_7[spsrIndex], _GEN_8[spsrIndex]};
-  wire [1:0]        bBus_hi_3 = {_GEN_5[spsrIndex], _GEN_6[spsrIndex]};
-  wire [1:0]        bBus_lo_hi_1 = {_GEN_11[spsrIndex], _GEN_12[spsrIndex]};
-  wire [6:0]        bBus_lo_3 = {bBus_lo_hi_1, _GEN_13[spsrIndex]};
-  wire [23:0]       bBus_hi_hi_1 = {bBus_hi_3, bBus_lo_2, _GEN_9[spsrIndex]};
-  wire [24:0]       bBus_hi_4 = {bBus_hi_hi_1, _GEN_10[spsrIndex]};
+  wire [1:0]        bBus_lo_2 = {_GEN_5[spsrIndex], _GEN_6[spsrIndex]};
+  wire [1:0]        bBus_hi_2 = {_GEN_3[spsrIndex], _GEN_4[spsrIndex]};
+  wire [1:0]        bBus_lo_hi_1 = {_GEN_9[spsrIndex], _GEN_10[spsrIndex]};
+  wire [6:0]        bBus_lo_3 = {bBus_lo_hi_1, _GEN_11[spsrIndex]};
+  wire [23:0]       bBus_hi_hi_1 = {bBus_hi_2, bBus_lo_2, _GEN_7[spsrIndex]};
+  wire [24:0]       bBus_hi_3 = {bBus_hi_hi_1, _GEN_8[spsrIndex]};
   wire [6:0]        bBus_lo_5 = {bBus_lo_hi_2, cpsr_mode};
-  wire [23:0]       bBus_hi_hi_2 = {bBus_hi_5, bBus_lo_4, cpsr_padding};
-  wire [24:0]       bBus_hi_6 = {bBus_hi_hi_2, cpsr_irqDisable};
-  wire              control_regUserReadC;
-  wire [4:0]        _cBus_shadow_T_4 = control_regUserReadC ? 5'h10 : cpsr_mode;
+  wire [23:0]       bBus_hi_hi_2 = {bBus_hi_4, bBus_lo_4, cpsr_padding};
+  wire [24:0]       bBus_hi_5 = {bBus_hi_hi_2, cpsr_irqDisable};
+  wire              _GEN_12 = cpsr_mode == 5'h11;
+  wire              cBus_inFiq;
+  assign cBus_inFiq = _GEN_12;
+  wire              inFiq;
+  assign inFiq = _GEN_12;
+  wire              _GEN_13 = cpsr_mode == 5'h10 | (&cpsr_mode);
+  wire              cBus_inGrp0;
+  assign cBus_inGrp0 = _GEN_13;
+  wire              inGrp0;
+  assign inGrp0 = _GEN_13;
   wire [3:0]        control_regReadC;
-  wire [31:0]       _GEN_14 = _GEN[{1'h0, control_regReadC}];
-  wire [31:0]       cBus_fiqBank =
-    control_regReadC == 4'hE
-      ? registers_30
-      : control_regReadC == 4'hD
-          ? registers_29
-          : control_regReadC == 4'hC
-              ? registers_28
-              : control_regReadC == 4'hB
-                  ? registers_27
-                  : control_regReadC == 4'hA
-                      ? registers_26
-                      : control_regReadC == 4'h9 ? registers_25 : control_regReadC == 4'h8 ? registers_24 : _GEN_14;
-  wire              cBus_hi = control_regReadC == 4'hE;
-  wire [31:0]       cBus_shadow =
-    _cBus_shadow_T_4 == 5'h12
-      ? (cBus_hi ? registers_23 : registers_22)
-      : _cBus_shadow_T_4 == 5'h1B
-          ? (cBus_hi ? registers_21 : registers_20)
-          : _cBus_shadow_T_4 == 5'h17
-              ? (cBus_hi ? registers_19 : registers_18)
-              : _cBus_shadow_T_4 == 5'h13 ? (cBus_hi ? registers_17 : registers_16) : _GEN_14;
-  wire              cBus_is1314 = control_regReadC == 4'hD | cBus_hi;
-  wire              cBus_fiqHit = _cBus_shadow_T_4 == 5'h11 & control_regReadC[3] & control_regReadC != 4'hF;
-  wire [31:0]       cBus = cBus_fiqHit ? cBus_fiqBank : cBus_is1314 ? cBus_shadow : _GEN_14;
-  wire              control_regUserWrite;
-  wire [4:0]        wmode = control_regUserWrite ? 5'h10 : control_regBankMode;
-  wire [3:0]        control_regWriteIndex;
-  wire              whi = control_regWriteIndex == 4'hE;
-  wire              wfiq = wmode == 5'h11 & control_regWriteIndex[3] & control_regWriteIndex != 4'hF;
-  wire [4:0]        _GEN_15 = {1'h0, control_regWriteIndex};
-  wire [4:0]        wshadow =
-    wmode == 5'h12
-      ? {4'hB, whi}
-      : wmode == 5'h1B ? {4'hA, whi} : wmode == 5'h17 ? {4'h9, whi} : wmode == 5'h13 ? {4'h8, whi} : _GEN_15;
-  wire [4:0]        wphys =
-    wfiq ? {1'h1, control_regWriteIndex} : control_regWriteIndex == 4'hD | whi ? wshadow : _GEN_15;
+  wire              _cBus_T_8 = control_regReadC < 4'hD;
+  wire [7:0][31:0]  _GEN_14 =
+    {{bank_r8_12_0},
+     {bank_r8_12_0},
+     {bank_r8_12_0},
+     {bank_r8_12_4},
+     {bank_r8_12_3},
+     {bank_r8_12_2},
+     {bank_r8_12_1},
+     {bank_r8_12_0}};
+  wire              control_regUserReadC;
+  wire [31:0]       cBus =
+    control_regUserReadC
+      ? (control_regReadC == 4'hD
+           ? (cBus_inGrp0 ? active_13 : bank_r13_0)
+           : control_regReadC == 4'hE
+               ? (cBus_inGrp0 ? active_14 : bank_r14_0)
+               : control_regReadC[3] & _cBus_T_8 & cBus_inFiq
+                   ? _GEN_14[control_regReadC[3] & _cBus_T_8 ? control_regReadC[2:0] : 3'h0]
+                   : _GEN[control_regReadC])
+      : _GEN[control_regReadC];
   wire              aluConditionOut_n;
   wire              control_cpsrUpdateCond;
   wire              aluConditionOut_z;
@@ -499,45 +426,62 @@ module ARM7TDMI(
   wire              aluConditionOut_v;
   wire              control_cpsrUpdateThumb;
   wire [1:0]        control_cpsrUpdateFields;
-  wire              _GEN_16 = control_cpsrUpdateFields[0] & modePrivileged;
+  wire              _GEN_15 = control_cpsrUpdateFields[0] & modePrivileged;
   wire [31:0]       aluBus;
   wire              control_cpsrRestore;
-  wire              _GEN_17 = control_cpsrRestore & modeHasSpsr;
+  wire              _GEN_16 = control_cpsrRestore & modeHasSpsr;
   wire              nextCpsr_cond_c =
     enable
-      ? (_GEN_17
-           ? _GEN_7[spsrIndex]
+      ? (_GEN_16
+           ? _GEN_5[spsrIndex]
            : control_cpsrUpdateFields[1] ? aluBus[29] : control_cpsrUpdateCond ? aluConditionOut_c : cpsr_cond_c)
       : cpsr_cond_c;
   wire              nextCpsr_cond_v =
     enable
-      ? (_GEN_17
-           ? _GEN_8[spsrIndex]
+      ? (_GEN_16
+           ? _GEN_6[spsrIndex]
            : control_cpsrUpdateFields[1] ? aluBus[28] : control_cpsrUpdateCond ? aluConditionOut_v : cpsr_cond_v)
       : cpsr_cond_v;
-  wire [19:0]       nextCpsr_padding = enable & _GEN_17 ? _GEN_9[spsrIndex] : cpsr_padding;
+  wire [19:0]       nextCpsr_padding = enable & _GEN_16 ? _GEN_7[spsrIndex] : cpsr_padding;
   wire              control_startException;
   wire [4:0]        nextCpsr_mode =
     enable
       ? (control_startException
            ? control_regBankMode
-           : _GEN_17 ? _GEN_13[spsrIndex] : _GEN_16 ? aluBus[4:0] : cpsr_mode)
+           : _GEN_16 ? _GEN_11[spsrIndex] : _GEN_15 ? aluBus[4:0] : cpsr_mode)
       : cpsr_mode;
   wire              nextCpsr_thumb =
     enable
       ? ~control_startException
-        & (_GEN_17 ? _GEN_12[spsrIndex] : _GEN_16 ? aluBus[5] : control_cpsrUpdateThumb ? aBus[0] : cpsr_thumb)
+        & (_GEN_16 ? _GEN_10[spsrIndex] : _GEN_15 ? aluBus[5] : control_cpsrUpdateThumb ? aBus[0] : cpsr_thumb)
       : cpsr_thumb;
   wire              nextCpsr_irqDisable =
     enable
-      ? control_startException | (_GEN_17 ? _GEN_10[spsrIndex] : _GEN_16 ? aluBus[7] : cpsr_irqDisable)
+      ? control_startException | (_GEN_16 ? _GEN_8[spsrIndex] : _GEN_15 ? aluBus[7] : cpsr_irqDisable)
       : cpsr_irqDisable;
-  wire              _GEN_18 = control_regBankMode == 5'h11;
-  wire              control_shiftDoLatch;
   wire              nextCpsr_fiqDisable =
     enable
-      ? control_startException & _GEN_18 | (_GEN_17 ? _GEN_11[spsrIndex] : _GEN_16 ? aluBus[6] : cpsr_fiqDisable)
+      ? control_startException & control_regBankMode == 5'h11
+        | (_GEN_16 ? _GEN_9[spsrIndex] : _GEN_15 ? aluBus[6] : cpsr_fiqDisable)
       : cpsr_fiqDisable;
+  wire              modeChanging = nextCpsr_mode != cpsr_mode;
+  wire [2:0]        oldGrp =
+    cpsr_mode == 5'h1B
+      ? 3'h5
+      : cpsr_mode == 5'h17
+          ? 3'h4
+          : {1'h0, cpsr_mode == 5'h13 ? 2'h3 : cpsr_mode == 5'h12 ? 2'h2 : {1'h0, cpsr_mode == 5'h11}};
+  wire [2:0]        newGrp =
+    nextCpsr_mode == 5'h1B
+      ? 3'h5
+      : nextCpsr_mode == 5'h17
+          ? 3'h4
+          : {1'h0, nextCpsr_mode == 5'h13 ? 2'h3 : nextCpsr_mode == 5'h12 ? 2'h2 : {1'h0, nextCpsr_mode == 5'h11}};
+  wire [7:0][31:0]  _GEN_17 =
+    {{bank_r13_0}, {bank_r13_0}, {bank_r13_5}, {bank_r13_4}, {bank_r13_3}, {bank_r13_2}, {bank_r13_1}, {bank_r13_0}};
+  wire [7:0][31:0]  _GEN_18 =
+    {{bank_r14_0}, {bank_r14_0}, {bank_r14_5}, {bank_r14_4}, {bank_r14_3}, {bank_r14_2}, {bank_r14_1}, {bank_r14_0}};
+  wire              control_shiftDoLatch;
   wire              control_aluInAAlign4;
   wire              control_aluOutAlign4;
   assign aluBus = ({32{~control_aluOutAlign4}} | 32'hFFFFFFFC) & _alu_io_out;
@@ -546,8 +490,8 @@ module ARM7TDMI(
     control_cpsrFromMultiply
       ? _multiplier_io_outFlagZ
       : enable
-          ? (_GEN_17
-               ? _GEN_6[spsrIndex]
+          ? (_GEN_16
+               ? _GEN_4[spsrIndex]
                : control_cpsrUpdateFields[1] ? aluBus[30] : control_cpsrUpdateCond ? aluConditionOut_z : cpsr_cond_z)
           : cpsr_cond_z;
   wire              control_incrementerForceWord;
@@ -555,8 +499,8 @@ module ARM7TDMI(
     control_cpsrFromMultiply
       ? _multiplier_io_outFlagN
       : enable
-          ? (_GEN_17
-               ? _GEN_5[spsrIndex]
+          ? (_GEN_16
+               ? _GEN_3[spsrIndex]
                : control_cpsrUpdateFields[1] ? aluBus[31] : control_cpsrUpdateCond ? aluConditionOut_n : cpsr_cond_n)
           : cpsr_cond_n;
   wire [31:0]       incrementerBus = memAddrReg + {29'h0, cpsrBus_thumb & ~control_incrementerForceWord ? 3'h2 : 3'h4};
@@ -579,11 +523,11 @@ module ARM7TDMI(
     {{control_immediate},
      {_multiplier_io_outHi},
      {_multiplier_io_outLo},
-     {modeHasSpsr ? {bBus_hi_4, bBus_lo_3} : {bBus_hi_6, bBus_lo_5}},
-     {{bBus_hi_2, bBus_lo_1}},
+     {modeHasSpsr ? {bBus_hi_3, bBus_lo_3} : {bBus_hi_5, bBus_lo_5}},
+     {{bBus_hi_1, bBus_lo_1}},
      {readData},
      {control_immediate},
-     {bBus_fiqHit ? bBus_fiqBank : bBus_is1314 ? bBus_shadow : _GEN_1}};
+     {_GEN[control_regReadB]}};
   wire [2:0]        control_busB;
   wire [31:0]       bBus = _GEN_19[control_busB];
   wire [1:0]        signByte = lastMemReadWidth == 2'h1 ? {lastMemReadAlign[1], 1'h1} : lastMemReadAlign;
@@ -609,90 +553,56 @@ module ARM7TDMI(
   wire              atSafePoint = _controlUnit_io_atBoundary & _multiplier_io_done;
   reg               halted;
   assign freeze = io_saveReq_0 & (halted | atSafePoint);
-  wire              _decodeUnit_io_state_writeEnable_T_2 = io_state_address_0 < 6'h2D;
-  wire              _controlUnit_io_state_writeEnable_T_2 = io_state_address_0 < 6'h32;
-  wire              _multiplier_io_state_writeEnable_T_2 = io_state_address_0 < 6'h37;
-  wire              _GEN_20 = io_state_address_0 < 6'h1F;
-  wire              _GEN_21 = io_state_address_0 == 6'h1F;
+  wire              _decodeUnit_io_state_writeEnable_T_2 = io_state_address_0 < 6'h2F;
+  wire              _controlUnit_io_state_writeEnable_T_2 = io_state_address_0 < 6'h34;
+  wire              _multiplier_io_state_writeEnable_T_2 = io_state_address_0 < 6'h39;
+  wire              _GEN_20 = io_state_address_0 < 6'h10;
+  wire              _GEN_21 = io_state_address_0 < 6'h16;
+  wire              _GEN_22 = io_state_address_0 < 6'h1C;
+  wire              _GEN_23 = io_state_address_0 < 6'h21;
+  wire              _GEN_24 = io_state_address_0 == 6'h21;
   wire [6:0]        io_state_readData_lo_1 = {io_state_readData_lo_hi, cpsr_mode};
   wire [23:0]       io_state_readData_hi_hi = {io_state_readData_hi, io_state_readData_lo, cpsr_padding};
   wire [24:0]       io_state_readData_hi_1 = {io_state_readData_hi_hi, cpsr_irqDisable};
-  wire              _GEN_22 = io_state_address_0 < 6'h25;
-  wire [1:0]        io_state_readData_lo_2 = {_GEN_7[io_state_address_0[2:0]], _GEN_8[io_state_address_0[2:0]]};
-  wire [1:0]        io_state_readData_hi_2 = {_GEN_5[io_state_address_0[2:0]], _GEN_6[io_state_address_0[2:0]]};
-  wire [1:0]        io_state_readData_lo_hi_1 = {_GEN_11[io_state_address_0[2:0]], _GEN_12[io_state_address_0[2:0]]};
-  wire [6:0]        io_state_readData_lo_3 = {io_state_readData_lo_hi_1, _GEN_13[io_state_address_0[2:0]]};
+  wire              _GEN_25 = io_state_address_0 < 6'h27;
+  wire [2:0]        _io_state_readData_T_13 = io_state_address_0[2:0] - 3'h2;
+  wire [1:0]        io_state_readData_lo_2 = {_GEN_5[_io_state_readData_T_13], _GEN_6[_io_state_readData_T_13]};
+  wire [1:0]        io_state_readData_hi_2 = {_GEN_3[_io_state_readData_T_13], _GEN_4[_io_state_readData_T_13]};
+  wire [1:0]        io_state_readData_lo_hi_1 = {_GEN_9[_io_state_readData_T_13], _GEN_10[_io_state_readData_T_13]};
+  wire [6:0]        io_state_readData_lo_3 = {io_state_readData_lo_hi_1, _GEN_11[_io_state_readData_T_13]};
   wire [23:0]       io_state_readData_hi_hi_1 =
-    {io_state_readData_hi_2, io_state_readData_lo_2, _GEN_9[io_state_address_0[2:0]]};
-  wire [24:0]       io_state_readData_hi_3 = {io_state_readData_hi_hi_1, _GEN_10[io_state_address_0[2:0]]};
-  wire              _GEN_23 = io_state_address_0 == 6'h25;
-  wire              _GEN_24 = io_state_address_0 == 6'h26;
-  wire              _GEN_25 = io_state_address_0 == 6'h27;
+    {io_state_readData_hi_2, io_state_readData_lo_2, _GEN_7[_io_state_readData_T_13]};
+  wire [24:0]       io_state_readData_hi_3 = {io_state_readData_hi_hi_1, _GEN_8[_io_state_readData_T_13]};
+  wire              _GEN_26 = io_state_address_0 == 6'h27;
+  wire              _GEN_27 = io_state_address_0 == 6'h28;
+  wire              _GEN_28 = io_state_address_0 == 6'h29;
   wire [3:0]        io_state_readData_hi_4 = {lastMemReadWidth, currentMemReadWidth};
   wire [31:0]       io_state_readData_0 =
     _GEN_20
-      ? _GEN[io_state_address_0[4:0]]
+      ? _GEN[io_state_address_0[3:0]]
       : _GEN_21
-          ? {io_state_readData_hi_1, io_state_readData_lo_1}
+          ? _GEN_17[io_state_address_0[2:0]]
           : _GEN_22
-              ? {io_state_readData_hi_3, io_state_readData_lo_3}
+              ? _GEN_18[io_state_address_0[2:0] + 3'h2]
               : _GEN_23
-                  ? memAddrReg
+                  ? _GEN_14[io_state_address_0[2:0] - 3'h4]
                   : _GEN_24
-                      ? memReadDataReg
+                      ? {io_state_readData_hi_1, io_state_readData_lo_1}
                       : _GEN_25
-                          ? {26'h0, io_state_readData_hi_4, lastMemReadAlign}
-                          : _decodeUnit_io_state_writeEnable_T_2
-                              ? _decodeUnit_io_state_readData
-                              : _controlUnit_io_state_writeEnable_T_2
-                                  ? _controlUnit_io_state_readData
-                                  : _multiplier_io_state_writeEnable_T_2
-                                      ? _multiplier_io_state_readData
-                                      : _shifter_io_state_readData;
-  wire [4:0]        _GEN_26 = {_GEN_18, 4'h0};
-  wire [4:0]        offset_8;
-  assign offset_8 = _GEN_26;
-  wire [4:0]        offset_9;
-  assign offset_9 = _GEN_26;
-  wire [4:0]        offset_10;
-  assign offset_10 = _GEN_26;
-  wire [4:0]        offset_11;
-  assign offset_11 = _GEN_26;
-  wire [4:0]        offset_12;
-  assign offset_12 = _GEN_26;
-  wire [4:0]        offset_16;
-  assign offset_16 = _GEN_26;
-  wire [4:0]        offset_17;
-  assign offset_17 = _GEN_26;
-  wire [4:0]        offset_18;
-  assign offset_18 = _GEN_26;
-  wire [4:0]        offset_19;
-  assign offset_19 = _GEN_26;
-  wire [4:0]        offset_20;
-  assign offset_20 = _GEN_26;
-  wire [4:0]        _GEN_27 =
-    _GEN_18
-      ? 5'h10
-      : control_regBankMode == 5'h13
-          ? 5'h3
-          : control_regBankMode == 5'h17
-              ? 5'h5
-              : control_regBankMode == 5'h1B ? 5'h7 : control_regBankMode == 5'h12 ? 5'h9 : 5'h0;
-  wire [4:0]        offset_13;
-  assign offset_13 = _GEN_27;
-  wire [4:0]        offset_14;
-  assign offset_14 = _GEN_27;
-  wire [4:0]        offset_21;
-  assign offset_21 = _GEN_27;
-  wire [4:0]        offset_22;
-  assign offset_22 = _GEN_27;
-  wire [31:0]       io_debug_registers_8_0 = _GEN[offset_8 + 5'h8];
-  wire [31:0]       io_debug_registers_9_0 = _GEN[offset_9 + 5'h9];
-  wire [31:0]       io_debug_registers_10_0 = _GEN[offset_10 + 5'hA];
-  wire [31:0]       io_debug_registers_11_0 = _GEN[offset_11 + 5'hB];
-  wire [31:0]       io_debug_registers_12_0 = _GEN[offset_12 + 5'hC];
-  wire [31:0]       io_debug_registers_13_0 = _GEN[offset_13 + 5'hD];
-  wire [31:0]       io_debug_registers_14_0 = _GEN[offset_14 + 5'hE];
+                          ? {io_state_readData_hi_3, io_state_readData_lo_3}
+                          : _GEN_26
+                              ? memAddrReg
+                              : _GEN_27
+                                  ? memReadDataReg
+                                  : _GEN_28
+                                      ? {26'h0, io_state_readData_hi_4, lastMemReadAlign}
+                                      : _decodeUnit_io_state_writeEnable_T_2
+                                          ? _decodeUnit_io_state_readData
+                                          : _controlUnit_io_state_writeEnable_T_2
+                                              ? _controlUnit_io_state_readData
+                                              : _multiplier_io_state_writeEnable_T_2
+                                                  ? _multiplier_io_state_readData
+                                                  : _shifter_io_state_readData;
   wire [6:0]        io_debug_cpsr_lo_1 = {io_debug_cpsr_lo_hi, cpsr_mode};
   wire [23:0]       io_debug_cpsr_hi_hi = {io_debug_cpsr_hi, io_debug_cpsr_lo, cpsr_padding};
   wire [24:0]       io_debug_cpsr_hi_1 = {io_debug_cpsr_hi_hi, cpsr_irqDisable};
@@ -701,58 +611,61 @@ module ARM7TDMI(
   wire [23:0]       hi_hi = {hi, lo, cpsr_padding};
   wire [24:0]       hi_1 = {hi_hi, cpsr_irqDisable};
   wire              control_pcNext;
+  wire [3:0]        control_regWriteIndex;
   wire              control_regWriteEnable;
+  wire              control_regUserWrite;
   wire [1:0]        control_spsrUpdateFields;
   wire              control_latchMemReadData;
   always @(posedge clock) begin
-    automatic logic _GEN_28;
-    automatic logic _GEN_29;
-    automatic logic _GEN_30;
-    automatic logic _GEN_31 = _GEN_20 | _GEN_21;
-    _GEN_28 = control_spsrUpdateFields[0] & modeHasSpsr;
-    _GEN_29 = control_spsrUpdateFields[1] & modeHasSpsr;
-    _GEN_30 = enable & control_latchMemReadData;
-    if (~io_state_writeEnable_0 | _GEN_20 | _GEN_21 | _GEN_22 | ~_GEN_23) begin
+    automatic logic       _GEN_29;
+    automatic logic       _GEN_30;
+    automatic logic       _GEN_31;
+    automatic logic [2:0] _GEN_32 = io_state_address_0[2:0] - 3'h2;
+    automatic logic       _GEN_33 = _GEN_20 | _GEN_21 | _GEN_22 | _GEN_23 | _GEN_24;
+    _GEN_29 = control_spsrUpdateFields[0] & modeHasSpsr;
+    _GEN_30 = control_spsrUpdateFields[1] & modeHasSpsr;
+    _GEN_31 = enable & control_latchMemReadData;
+    if (~io_state_writeEnable_0 | _GEN_20 | _GEN_21 | _GEN_22 | _GEN_23 | _GEN_24 | _GEN_25 | ~_GEN_26) begin
       if (enable)
         memAddrReg <= io_mem_ADDR_0;
     end
     else
       memAddrReg <= io_state_writeData_0;
-    if (~io_state_writeEnable_0 | _GEN_20 | _GEN_21 | _GEN_22 | _GEN_23 | ~_GEN_24) begin
-      if (_GEN_30)
+    if (~io_state_writeEnable_0 | _GEN_20 | _GEN_21 | _GEN_22 | _GEN_23 | _GEN_24 | _GEN_25 | _GEN_26 | ~_GEN_27) begin
+      if (_GEN_31)
         memReadDataReg <= io_mem_RDATA_0;
     end
     else
       memReadDataReg <= io_state_writeData_0;
-    if (~io_state_writeEnable_0 | _GEN_31 | ~(_GEN_22 & io_state_address_0[2:0] == 3'h0)) begin
-      automatic logic _GEN_32;
-      automatic logic _GEN_33;
-      _GEN_32 = spsrIndex == 3'h0;
-      _GEN_33 = control_startException & _GEN_32;
+    if (~io_state_writeEnable_0 | _GEN_33 | ~(_GEN_25 & _GEN_32 == 3'h0)) begin
+      automatic logic _GEN_34;
+      automatic logic _GEN_35;
+      _GEN_34 = spsrIndex == 3'h0;
+      _GEN_35 = control_startException & _GEN_34;
       if (enable) begin
-        if (_GEN_33) begin
+        if (_GEN_35) begin
           spsrVec_0_cond_n <= cpsrBus_cond_n;
           spsrVec_0_cond_z <= cpsrBus_cond_z;
           spsrVec_0_cond_c <= cpsrBus_cond_c;
           spsrVec_0_cond_v <= cpsrBus_cond_v;
         end
-        else if (_GEN_29 & _GEN_32) begin
+        else if (_GEN_30 & _GEN_34) begin
           spsrVec_0_cond_n <= aluBus[31];
           spsrVec_0_cond_z <= aluBus[30];
           spsrVec_0_cond_c <= aluBus[29];
           spsrVec_0_cond_v <= aluBus[28];
         end
       end
-      if (enable & _GEN_33)
+      if (enable & _GEN_35)
         spsrVec_0_padding <= cpsrBus_padding;
       if (enable) begin
-        if (_GEN_33) begin
+        if (_GEN_35) begin
           spsrVec_0_irqDisable <= cpsrBus_irqDisable;
           spsrVec_0_fiqDisable <= cpsrBus_fiqDisable;
           spsrVec_0_thumb <= cpsrBus_thumb;
           spsrVec_0_mode <= cpsrBus_mode;
         end
-        else if (_GEN_28 & _GEN_32) begin
+        else if (_GEN_29 & _GEN_34) begin
           spsrVec_0_irqDisable <= aluBus[7];
           spsrVec_0_fiqDisable <= aluBus[6];
           spsrVec_0_thumb <= aluBus[5];
@@ -771,35 +684,35 @@ module ARM7TDMI(
       spsrVec_0_thumb <= io_state_writeData_0[5];
       spsrVec_0_mode <= io_state_writeData_0[4:0];
     end
-    if (~io_state_writeEnable_0 | _GEN_31 | ~(_GEN_22 & io_state_address_0[2:0] == 3'h1)) begin
-      automatic logic _GEN_34;
-      automatic logic _GEN_35;
-      _GEN_34 = spsrIndex == 3'h1;
-      _GEN_35 = control_startException & _GEN_34;
+    if (~io_state_writeEnable_0 | _GEN_33 | ~(_GEN_25 & _GEN_32 == 3'h1)) begin
+      automatic logic _GEN_36;
+      automatic logic _GEN_37;
+      _GEN_36 = spsrIndex == 3'h1;
+      _GEN_37 = control_startException & _GEN_36;
       if (enable) begin
-        if (_GEN_35) begin
+        if (_GEN_37) begin
           spsrVec_1_cond_n <= cpsrBus_cond_n;
           spsrVec_1_cond_z <= cpsrBus_cond_z;
           spsrVec_1_cond_c <= cpsrBus_cond_c;
           spsrVec_1_cond_v <= cpsrBus_cond_v;
         end
-        else if (_GEN_29 & _GEN_34) begin
+        else if (_GEN_30 & _GEN_36) begin
           spsrVec_1_cond_n <= aluBus[31];
           spsrVec_1_cond_z <= aluBus[30];
           spsrVec_1_cond_c <= aluBus[29];
           spsrVec_1_cond_v <= aluBus[28];
         end
       end
-      if (enable & _GEN_35)
+      if (enable & _GEN_37)
         spsrVec_1_padding <= cpsrBus_padding;
       if (enable) begin
-        if (_GEN_35) begin
+        if (_GEN_37) begin
           spsrVec_1_irqDisable <= cpsrBus_irqDisable;
           spsrVec_1_fiqDisable <= cpsrBus_fiqDisable;
           spsrVec_1_thumb <= cpsrBus_thumb;
           spsrVec_1_mode <= cpsrBus_mode;
         end
-        else if (_GEN_28 & _GEN_34) begin
+        else if (_GEN_29 & _GEN_36) begin
           spsrVec_1_irqDisable <= aluBus[7];
           spsrVec_1_fiqDisable <= aluBus[6];
           spsrVec_1_thumb <= aluBus[5];
@@ -818,35 +731,35 @@ module ARM7TDMI(
       spsrVec_1_thumb <= io_state_writeData_0[5];
       spsrVec_1_mode <= io_state_writeData_0[4:0];
     end
-    if (~io_state_writeEnable_0 | _GEN_31 | ~(_GEN_22 & io_state_address_0[2:0] == 3'h2)) begin
-      automatic logic _GEN_36;
-      automatic logic _GEN_37;
-      _GEN_36 = spsrIndex == 3'h2;
-      _GEN_37 = control_startException & _GEN_36;
+    if (~io_state_writeEnable_0 | _GEN_33 | ~(_GEN_25 & _GEN_32 == 3'h2)) begin
+      automatic logic _GEN_38;
+      automatic logic _GEN_39;
+      _GEN_38 = spsrIndex == 3'h2;
+      _GEN_39 = control_startException & _GEN_38;
       if (enable) begin
-        if (_GEN_37) begin
+        if (_GEN_39) begin
           spsrVec_2_cond_n <= cpsrBus_cond_n;
           spsrVec_2_cond_z <= cpsrBus_cond_z;
           spsrVec_2_cond_c <= cpsrBus_cond_c;
           spsrVec_2_cond_v <= cpsrBus_cond_v;
         end
-        else if (_GEN_29 & _GEN_36) begin
+        else if (_GEN_30 & _GEN_38) begin
           spsrVec_2_cond_n <= aluBus[31];
           spsrVec_2_cond_z <= aluBus[30];
           spsrVec_2_cond_c <= aluBus[29];
           spsrVec_2_cond_v <= aluBus[28];
         end
       end
-      if (enable & _GEN_37)
+      if (enable & _GEN_39)
         spsrVec_2_padding <= cpsrBus_padding;
       if (enable) begin
-        if (_GEN_37) begin
+        if (_GEN_39) begin
           spsrVec_2_irqDisable <= cpsrBus_irqDisable;
           spsrVec_2_fiqDisable <= cpsrBus_fiqDisable;
           spsrVec_2_thumb <= cpsrBus_thumb;
           spsrVec_2_mode <= cpsrBus_mode;
         end
-        else if (_GEN_28 & _GEN_36) begin
+        else if (_GEN_29 & _GEN_38) begin
           spsrVec_2_irqDisable <= aluBus[7];
           spsrVec_2_fiqDisable <= aluBus[6];
           spsrVec_2_thumb <= aluBus[5];
@@ -865,35 +778,35 @@ module ARM7TDMI(
       spsrVec_2_thumb <= io_state_writeData_0[5];
       spsrVec_2_mode <= io_state_writeData_0[4:0];
     end
-    if (~io_state_writeEnable_0 | _GEN_31 | ~(_GEN_22 & io_state_address_0[2:0] == 3'h3)) begin
-      automatic logic _GEN_38;
-      automatic logic _GEN_39;
-      _GEN_38 = spsrIndex == 3'h3;
-      _GEN_39 = control_startException & _GEN_38;
+    if (~io_state_writeEnable_0 | _GEN_33 | ~(_GEN_25 & _GEN_32 == 3'h3)) begin
+      automatic logic _GEN_40;
+      automatic logic _GEN_41;
+      _GEN_40 = spsrIndex == 3'h3;
+      _GEN_41 = control_startException & _GEN_40;
       if (enable) begin
-        if (_GEN_39) begin
+        if (_GEN_41) begin
           spsrVec_3_cond_n <= cpsrBus_cond_n;
           spsrVec_3_cond_z <= cpsrBus_cond_z;
           spsrVec_3_cond_c <= cpsrBus_cond_c;
           spsrVec_3_cond_v <= cpsrBus_cond_v;
         end
-        else if (_GEN_29 & _GEN_38) begin
+        else if (_GEN_30 & _GEN_40) begin
           spsrVec_3_cond_n <= aluBus[31];
           spsrVec_3_cond_z <= aluBus[30];
           spsrVec_3_cond_c <= aluBus[29];
           spsrVec_3_cond_v <= aluBus[28];
         end
       end
-      if (enable & _GEN_39)
+      if (enable & _GEN_41)
         spsrVec_3_padding <= cpsrBus_padding;
       if (enable) begin
-        if (_GEN_39) begin
+        if (_GEN_41) begin
           spsrVec_3_irqDisable <= cpsrBus_irqDisable;
           spsrVec_3_fiqDisable <= cpsrBus_fiqDisable;
           spsrVec_3_thumb <= cpsrBus_thumb;
           spsrVec_3_mode <= cpsrBus_mode;
         end
-        else if (_GEN_28 & _GEN_38) begin
+        else if (_GEN_29 & _GEN_40) begin
           spsrVec_3_irqDisable <= aluBus[7];
           spsrVec_3_fiqDisable <= aluBus[6];
           spsrVec_3_thumb <= aluBus[5];
@@ -912,35 +825,35 @@ module ARM7TDMI(
       spsrVec_3_thumb <= io_state_writeData_0[5];
       spsrVec_3_mode <= io_state_writeData_0[4:0];
     end
-    if (~io_state_writeEnable_0 | _GEN_31 | ~(_GEN_22 & io_state_address_0[2:0] == 3'h4)) begin
-      automatic logic _GEN_40;
-      automatic logic _GEN_41;
-      _GEN_40 = spsrIndex == 3'h4;
-      _GEN_41 = control_startException & _GEN_40;
+    if (~io_state_writeEnable_0 | _GEN_33 | ~(_GEN_25 & _GEN_32 == 3'h4)) begin
+      automatic logic _GEN_42;
+      automatic logic _GEN_43;
+      _GEN_42 = spsrIndex == 3'h4;
+      _GEN_43 = control_startException & _GEN_42;
       if (enable) begin
-        if (_GEN_41) begin
+        if (_GEN_43) begin
           spsrVec_4_cond_n <= cpsrBus_cond_n;
           spsrVec_4_cond_z <= cpsrBus_cond_z;
           spsrVec_4_cond_c <= cpsrBus_cond_c;
           spsrVec_4_cond_v <= cpsrBus_cond_v;
         end
-        else if (_GEN_29 & _GEN_40) begin
+        else if (_GEN_30 & _GEN_42) begin
           spsrVec_4_cond_n <= aluBus[31];
           spsrVec_4_cond_z <= aluBus[30];
           spsrVec_4_cond_c <= aluBus[29];
           spsrVec_4_cond_v <= aluBus[28];
         end
       end
-      if (enable & _GEN_41)
+      if (enable & _GEN_43)
         spsrVec_4_padding <= cpsrBus_padding;
       if (enable) begin
-        if (_GEN_41) begin
+        if (_GEN_43) begin
           spsrVec_4_irqDisable <= cpsrBus_irqDisable;
           spsrVec_4_fiqDisable <= cpsrBus_fiqDisable;
           spsrVec_4_thumb <= cpsrBus_thumb;
           spsrVec_4_mode <= cpsrBus_mode;
         end
-        else if (_GEN_28 & _GEN_40) begin
+        else if (_GEN_29 & _GEN_42) begin
           spsrVec_4_irqDisable <= aluBus[7];
           spsrVec_4_fiqDisable <= aluBus[6];
           spsrVec_4_thumb <= aluBus[5];
@@ -959,10 +872,11 @@ module ARM7TDMI(
       spsrVec_4_thumb <= io_state_writeData_0[5];
       spsrVec_4_mode <= io_state_writeData_0[4:0];
     end
-    if (~io_state_writeEnable_0 | _GEN_20 | _GEN_21 | _GEN_22 | _GEN_23 | _GEN_24 | ~_GEN_25) begin
+    if (~io_state_writeEnable_0 | _GEN_20 | _GEN_21 | _GEN_22 | _GEN_23 | _GEN_24 | _GEN_25 | _GEN_26 | _GEN_27
+        | ~_GEN_28) begin
       if (enable)
         currentMemReadWidth <= io_mem_SIZE_0;
-      if (_GEN_30) begin
+      if (_GEN_31) begin
         lastMemReadWidth <= currentMemReadWidth;
         lastMemReadAlign <= memAddrReg[1:0];
       end
@@ -973,37 +887,39 @@ module ARM7TDMI(
       lastMemReadAlign <= io_state_writeData_0[1:0];
     end
     if (reset) begin
-      registers_0 <= 32'h0;
-      registers_1 <= 32'h0;
-      registers_2 <= 32'h0;
-      registers_3 <= 32'h0;
-      registers_4 <= 32'h0;
-      registers_5 <= 32'h0;
-      registers_6 <= 32'h0;
-      registers_7 <= 32'h0;
-      registers_8 <= 32'h0;
-      registers_9 <= 32'h0;
-      registers_10 <= 32'h0;
-      registers_11 <= 32'h0;
-      registers_12 <= 32'h0;
-      registers_13 <= 32'h0;
-      registers_14 <= 32'h0;
-      registers_15 <= 32'h0;
-      registers_16 <= 32'h0;
-      registers_17 <= 32'h0;
-      registers_18 <= 32'h0;
-      registers_19 <= 32'h0;
-      registers_20 <= 32'h0;
-      registers_21 <= 32'h0;
-      registers_22 <= 32'h0;
-      registers_23 <= 32'h0;
-      registers_24 <= 32'h0;
-      registers_25 <= 32'h0;
-      registers_26 <= 32'h0;
-      registers_27 <= 32'h0;
-      registers_28 <= 32'h0;
-      registers_29 <= 32'h0;
-      registers_30 <= 32'h0;
+      active_0 <= 32'h0;
+      active_1 <= 32'h0;
+      active_2 <= 32'h0;
+      active_3 <= 32'h0;
+      active_4 <= 32'h0;
+      active_5 <= 32'h0;
+      active_6 <= 32'h0;
+      active_7 <= 32'h0;
+      active_8 <= 32'h0;
+      active_9 <= 32'h0;
+      active_10 <= 32'h0;
+      active_11 <= 32'h0;
+      active_12 <= 32'h0;
+      active_13 <= 32'h0;
+      active_14 <= 32'h0;
+      active_15 <= 32'h0;
+      bank_r13_0 <= 32'h0;
+      bank_r13_1 <= 32'h0;
+      bank_r13_2 <= 32'h0;
+      bank_r13_3 <= 32'h0;
+      bank_r13_4 <= 32'h0;
+      bank_r13_5 <= 32'h0;
+      bank_r14_0 <= 32'h0;
+      bank_r14_1 <= 32'h0;
+      bank_r14_2 <= 32'h0;
+      bank_r14_3 <= 32'h0;
+      bank_r14_4 <= 32'h0;
+      bank_r14_5 <= 32'h0;
+      bank_r8_12_0 <= 32'h0;
+      bank_r8_12_1 <= 32'h0;
+      bank_r8_12_2 <= 32'h0;
+      bank_r8_12_3 <= 32'h0;
+      bank_r8_12_4 <= 32'h0;
       cpsr_cond_n <= 1'h0;
       cpsr_cond_z <= 1'h0;
       cpsr_cond_c <= 1'h0;
@@ -1016,135 +932,713 @@ module ARM7TDMI(
       halted <= 1'h0;
     end
     else begin
-      if (io_state_writeEnable_0 & _GEN_20 & io_state_address_0[4:0] == 5'h0)
-        registers_0 <= io_state_writeData_0;
-      else if (enable & control_regWriteEnable & wphys == 5'h0)
-        registers_0 <= aluBus;
-      if (io_state_writeEnable_0 & _GEN_20 & io_state_address_0[4:0] == 5'h1)
-        registers_1 <= io_state_writeData_0;
-      else if (enable & control_regWriteEnable & wphys == 5'h1)
-        registers_1 <= aluBus;
-      if (io_state_writeEnable_0 & _GEN_20 & io_state_address_0[4:0] == 5'h2)
-        registers_2 <= io_state_writeData_0;
-      else if (enable & control_regWriteEnable & wphys == 5'h2)
-        registers_2 <= aluBus;
-      if (io_state_writeEnable_0 & _GEN_20 & io_state_address_0[4:0] == 5'h3)
-        registers_3 <= io_state_writeData_0;
-      else if (enable & control_regWriteEnable & wphys == 5'h3)
-        registers_3 <= aluBus;
-      if (io_state_writeEnable_0 & _GEN_20 & io_state_address_0[4:0] == 5'h4)
-        registers_4 <= io_state_writeData_0;
-      else if (enable & control_regWriteEnable & wphys == 5'h4)
-        registers_4 <= aluBus;
-      if (io_state_writeEnable_0 & _GEN_20 & io_state_address_0[4:0] == 5'h5)
-        registers_5 <= io_state_writeData_0;
-      else if (enable & control_regWriteEnable & wphys == 5'h5)
-        registers_5 <= aluBus;
-      if (io_state_writeEnable_0 & _GEN_20 & io_state_address_0[4:0] == 5'h6)
-        registers_6 <= io_state_writeData_0;
-      else if (enable & control_regWriteEnable & wphys == 5'h6)
-        registers_6 <= aluBus;
-      if (io_state_writeEnable_0 & _GEN_20 & io_state_address_0[4:0] == 5'h7)
-        registers_7 <= io_state_writeData_0;
-      else if (enable & control_regWriteEnable & wphys == 5'h7)
-        registers_7 <= aluBus;
-      if (io_state_writeEnable_0 & _GEN_20 & io_state_address_0[4:0] == 5'h8)
-        registers_8 <= io_state_writeData_0;
-      else if (enable & control_regWriteEnable & wphys == 5'h8)
-        registers_8 <= aluBus;
-      if (io_state_writeEnable_0 & _GEN_20 & io_state_address_0[4:0] == 5'h9)
-        registers_9 <= io_state_writeData_0;
-      else if (enable & control_regWriteEnable & wphys == 5'h9)
-        registers_9 <= aluBus;
-      if (io_state_writeEnable_0 & _GEN_20 & io_state_address_0[4:0] == 5'hA)
-        registers_10 <= io_state_writeData_0;
-      else if (enable & control_regWriteEnable & wphys == 5'hA)
-        registers_10 <= aluBus;
-      if (io_state_writeEnable_0 & _GEN_20 & io_state_address_0[4:0] == 5'hB)
-        registers_11 <= io_state_writeData_0;
-      else if (enable & control_regWriteEnable & wphys == 5'hB)
-        registers_11 <= aluBus;
-      if (io_state_writeEnable_0 & _GEN_20 & io_state_address_0[4:0] == 5'hC)
-        registers_12 <= io_state_writeData_0;
-      else if (enable & control_regWriteEnable & wphys == 5'hC)
-        registers_12 <= aluBus;
-      if (io_state_writeEnable_0 & _GEN_20 & io_state_address_0[4:0] == 5'hD)
-        registers_13 <= io_state_writeData_0;
-      else if (enable & control_regWriteEnable & wphys == 5'hD)
-        registers_13 <= aluBus;
-      if (io_state_writeEnable_0 & _GEN_20 & io_state_address_0[4:0] == 5'hE)
-        registers_14 <= io_state_writeData_0;
-      else if (enable & control_regWriteEnable & wphys == 5'hE)
-        registers_14 <= aluBus;
-      if (io_state_writeEnable_0 & _GEN_20 & io_state_address_0[4:0] == 5'hF)
-        registers_15 <= io_state_writeData_0;
+      automatic logic       _GEN_44 = oldGrp == newGrp;
+      automatic logic       _GEN_45;
+      automatic logic       _GEN_46 = enable & modeChanging;
+      automatic logic       _GEN_47;
+      automatic logic       _GEN_48;
+      automatic logic       _GEN_49;
+      automatic logic       _GEN_50;
+      automatic logic       _GEN_51;
+      automatic logic       _GEN_52;
+      automatic logic       _GEN_53;
+      automatic logic       _GEN_54;
+      automatic logic       _GEN_55;
+      automatic logic       _GEN_56;
+      automatic logic       _GEN_57;
+      automatic logic [2:0] _GEN_58;
+      automatic logic       _GEN_59;
+      automatic logic       _GEN_60;
+      automatic logic [2:0] _GEN_61 = io_state_address_0[2:0] + 3'h2;
+      automatic logic       _GEN_62 = _GEN_20 | _GEN_21;
+      automatic logic [2:0] _GEN_63 = io_state_address_0[2:0] - 3'h4;
+      automatic logic       _GEN_64 = _GEN_20 | _GEN_21 | _GEN_22;
+      _GEN_45 = ~modeChanging | _GEN_44 | (|oldGrp);
+      _GEN_47 = ~_GEN_46 | _GEN_44 | oldGrp != 3'h1;
+      _GEN_48 = ~_GEN_46 | _GEN_44 | oldGrp != 3'h2;
+      _GEN_49 = ~_GEN_46 | _GEN_44 | oldGrp != 3'h3;
+      _GEN_50 = ~_GEN_46 | _GEN_44 | oldGrp != 3'h4;
+      _GEN_51 = ~_GEN_46 | _GEN_44 | oldGrp != 3'h5;
+      _GEN_52 = ~modeChanging | _GEN_44;
+      _GEN_53 = ~modeChanging | _GEN_12 == (nextCpsr_mode == 5'h11);
+      _GEN_54 = control_regWriteIndex == 4'hD;
+      _GEN_55 = control_regWriteIndex == 4'hE;
+      _GEN_56 = control_regWriteEnable & control_regUserWrite;
+      _GEN_57 = control_regWriteIndex[3] & control_regWriteIndex < 4'hD;
+      _GEN_58 = _GEN_57 ? control_regWriteIndex[2:0] : 3'h0;
+      _GEN_59 = _GEN_54 | _GEN_55;
+      _GEN_60 = enable & control_regWriteEnable;
+      if (io_state_writeEnable_0 & _GEN_20 & io_state_address_0[3:0] == 4'h0)
+        active_0 <= io_state_writeData_0;
+      else if (_GEN_60) begin
+        automatic logic _GEN_65;
+        _GEN_65 = control_regWriteIndex == 4'h0;
+        if (control_regUserWrite) begin
+          if (~_GEN_59) begin
+            if (_GEN_57) begin
+              if (inFiq | ~_GEN_65) begin
+              end
+              else
+                active_0 <= aluBus;
+            end
+            else if (_GEN_65)
+              active_0 <= aluBus;
+          end
+        end
+        else if (_GEN_65)
+          active_0 <= aluBus;
+      end
+      if (io_state_writeEnable_0 & _GEN_20 & io_state_address_0[3:0] == 4'h1)
+        active_1 <= io_state_writeData_0;
+      else if (_GEN_60) begin
+        automatic logic _GEN_66;
+        _GEN_66 = control_regWriteIndex == 4'h1;
+        if (control_regUserWrite) begin
+          if (~_GEN_59) begin
+            if (_GEN_57) begin
+              if (inFiq | ~_GEN_66) begin
+              end
+              else
+                active_1 <= aluBus;
+            end
+            else if (_GEN_66)
+              active_1 <= aluBus;
+          end
+        end
+        else if (_GEN_66)
+          active_1 <= aluBus;
+      end
+      if (io_state_writeEnable_0 & _GEN_20 & io_state_address_0[3:0] == 4'h2)
+        active_2 <= io_state_writeData_0;
+      else if (_GEN_60) begin
+        automatic logic _GEN_67;
+        _GEN_67 = control_regWriteIndex == 4'h2;
+        if (control_regUserWrite) begin
+          if (~_GEN_59) begin
+            if (_GEN_57) begin
+              if (inFiq | ~_GEN_67) begin
+              end
+              else
+                active_2 <= aluBus;
+            end
+            else if (_GEN_67)
+              active_2 <= aluBus;
+          end
+        end
+        else if (_GEN_67)
+          active_2 <= aluBus;
+      end
+      if (io_state_writeEnable_0 & _GEN_20 & io_state_address_0[3:0] == 4'h3)
+        active_3 <= io_state_writeData_0;
+      else if (_GEN_60) begin
+        automatic logic _GEN_68;
+        _GEN_68 = control_regWriteIndex == 4'h3;
+        if (control_regUserWrite) begin
+          if (~_GEN_59) begin
+            if (_GEN_57) begin
+              if (inFiq | ~_GEN_68) begin
+              end
+              else
+                active_3 <= aluBus;
+            end
+            else if (_GEN_68)
+              active_3 <= aluBus;
+          end
+        end
+        else if (_GEN_68)
+          active_3 <= aluBus;
+      end
+      if (io_state_writeEnable_0 & _GEN_20 & io_state_address_0[3:0] == 4'h4)
+        active_4 <= io_state_writeData_0;
+      else if (_GEN_60) begin
+        automatic logic _GEN_69;
+        _GEN_69 = control_regWriteIndex == 4'h4;
+        if (control_regUserWrite) begin
+          if (~_GEN_59) begin
+            if (_GEN_57) begin
+              if (inFiq | ~_GEN_69) begin
+              end
+              else
+                active_4 <= aluBus;
+            end
+            else if (_GEN_69)
+              active_4 <= aluBus;
+          end
+        end
+        else if (_GEN_69)
+          active_4 <= aluBus;
+      end
+      if (io_state_writeEnable_0 & _GEN_20 & io_state_address_0[3:0] == 4'h5)
+        active_5 <= io_state_writeData_0;
+      else if (_GEN_60) begin
+        automatic logic _GEN_70;
+        _GEN_70 = control_regWriteIndex == 4'h5;
+        if (control_regUserWrite) begin
+          if (~_GEN_59) begin
+            if (_GEN_57) begin
+              if (inFiq | ~_GEN_70) begin
+              end
+              else
+                active_5 <= aluBus;
+            end
+            else if (_GEN_70)
+              active_5 <= aluBus;
+          end
+        end
+        else if (_GEN_70)
+          active_5 <= aluBus;
+      end
+      if (io_state_writeEnable_0 & _GEN_20 & io_state_address_0[3:0] == 4'h6)
+        active_6 <= io_state_writeData_0;
+      else if (_GEN_60) begin
+        automatic logic _GEN_71;
+        _GEN_71 = control_regWriteIndex == 4'h6;
+        if (control_regUserWrite) begin
+          if (~_GEN_59) begin
+            if (_GEN_57) begin
+              if (inFiq | ~_GEN_71) begin
+              end
+              else
+                active_6 <= aluBus;
+            end
+            else if (_GEN_71)
+              active_6 <= aluBus;
+          end
+        end
+        else if (_GEN_71)
+          active_6 <= aluBus;
+      end
+      if (io_state_writeEnable_0 & _GEN_20 & io_state_address_0[3:0] == 4'h7)
+        active_7 <= io_state_writeData_0;
+      else if (_GEN_60) begin
+        automatic logic _GEN_72;
+        _GEN_72 = control_regWriteIndex == 4'h7;
+        if (control_regUserWrite) begin
+          if (~_GEN_59) begin
+            if (_GEN_57) begin
+              if (inFiq | ~_GEN_72) begin
+              end
+              else
+                active_7 <= aluBus;
+            end
+            else if (_GEN_72)
+              active_7 <= aluBus;
+          end
+        end
+        else if (_GEN_72)
+          active_7 <= aluBus;
+      end
+      if (io_state_writeEnable_0 & _GEN_20 & io_state_address_0[3:0] == 4'h8)
+        active_8 <= io_state_writeData_0;
+      else if (enable) begin
+        if (control_regWriteEnable) begin
+          automatic logic _GEN_73;
+          _GEN_73 = control_regWriteIndex == 4'h8;
+          if (control_regUserWrite) begin
+            if (_GEN_59) begin
+              if (_GEN_53) begin
+              end
+              else
+                active_8 <= bank_r8_12_0;
+            end
+            else if (_GEN_57) begin
+              if (inFiq | ~_GEN_73) begin
+                if (_GEN_53) begin
+                end
+                else
+                  active_8 <= bank_r8_12_0;
+              end
+              else
+                active_8 <= aluBus;
+            end
+            else if (_GEN_73)
+              active_8 <= aluBus;
+            else if (_GEN_53) begin
+            end
+            else
+              active_8 <= bank_r8_12_0;
+          end
+          else if (_GEN_73)
+            active_8 <= aluBus;
+          else if (_GEN_53) begin
+          end
+          else
+            active_8 <= bank_r8_12_0;
+        end
+        else if (_GEN_53) begin
+        end
+        else
+          active_8 <= bank_r8_12_0;
+      end
+      if (io_state_writeEnable_0 & _GEN_20 & io_state_address_0[3:0] == 4'h9)
+        active_9 <= io_state_writeData_0;
+      else if (enable) begin
+        if (control_regWriteEnable) begin
+          automatic logic _GEN_74;
+          _GEN_74 = control_regWriteIndex == 4'h9;
+          if (control_regUserWrite) begin
+            if (_GEN_59) begin
+              if (_GEN_53) begin
+              end
+              else
+                active_9 <= bank_r8_12_1;
+            end
+            else if (_GEN_57) begin
+              if (inFiq | ~_GEN_74) begin
+                if (_GEN_53) begin
+                end
+                else
+                  active_9 <= bank_r8_12_1;
+              end
+              else
+                active_9 <= aluBus;
+            end
+            else if (_GEN_74)
+              active_9 <= aluBus;
+            else if (_GEN_53) begin
+            end
+            else
+              active_9 <= bank_r8_12_1;
+          end
+          else if (_GEN_74)
+            active_9 <= aluBus;
+          else if (_GEN_53) begin
+          end
+          else
+            active_9 <= bank_r8_12_1;
+        end
+        else if (_GEN_53) begin
+        end
+        else
+          active_9 <= bank_r8_12_1;
+      end
+      if (io_state_writeEnable_0 & _GEN_20 & io_state_address_0[3:0] == 4'hA)
+        active_10 <= io_state_writeData_0;
+      else if (enable) begin
+        if (control_regWriteEnable) begin
+          automatic logic _GEN_75;
+          _GEN_75 = control_regWriteIndex == 4'hA;
+          if (control_regUserWrite) begin
+            if (_GEN_59) begin
+              if (_GEN_53) begin
+              end
+              else
+                active_10 <= bank_r8_12_2;
+            end
+            else if (_GEN_57) begin
+              if (inFiq | ~_GEN_75) begin
+                if (_GEN_53) begin
+                end
+                else
+                  active_10 <= bank_r8_12_2;
+              end
+              else
+                active_10 <= aluBus;
+            end
+            else if (_GEN_75)
+              active_10 <= aluBus;
+            else if (_GEN_53) begin
+            end
+            else
+              active_10 <= bank_r8_12_2;
+          end
+          else if (_GEN_75)
+            active_10 <= aluBus;
+          else if (_GEN_53) begin
+          end
+          else
+            active_10 <= bank_r8_12_2;
+        end
+        else if (_GEN_53) begin
+        end
+        else
+          active_10 <= bank_r8_12_2;
+      end
+      if (io_state_writeEnable_0 & _GEN_20 & io_state_address_0[3:0] == 4'hB)
+        active_11 <= io_state_writeData_0;
+      else if (enable) begin
+        if (control_regWriteEnable) begin
+          automatic logic _GEN_76;
+          _GEN_76 = control_regWriteIndex == 4'hB;
+          if (control_regUserWrite) begin
+            if (_GEN_59) begin
+              if (_GEN_53) begin
+              end
+              else
+                active_11 <= bank_r8_12_3;
+            end
+            else if (_GEN_57) begin
+              if (inFiq | ~_GEN_76) begin
+                if (_GEN_53) begin
+                end
+                else
+                  active_11 <= bank_r8_12_3;
+              end
+              else
+                active_11 <= aluBus;
+            end
+            else if (_GEN_76)
+              active_11 <= aluBus;
+            else if (_GEN_53) begin
+            end
+            else
+              active_11 <= bank_r8_12_3;
+          end
+          else if (_GEN_76)
+            active_11 <= aluBus;
+          else if (_GEN_53) begin
+          end
+          else
+            active_11 <= bank_r8_12_3;
+        end
+        else if (_GEN_53) begin
+        end
+        else
+          active_11 <= bank_r8_12_3;
+      end
+      if (io_state_writeEnable_0 & _GEN_20 & io_state_address_0[3:0] == 4'hC)
+        active_12 <= io_state_writeData_0;
+      else if (enable) begin
+        if (control_regWriteEnable) begin
+          automatic logic _GEN_77;
+          _GEN_77 = control_regWriteIndex == 4'hC;
+          if (control_regUserWrite) begin
+            if (_GEN_59) begin
+              if (_GEN_53) begin
+              end
+              else
+                active_12 <= bank_r8_12_4;
+            end
+            else if (_GEN_57) begin
+              if (inFiq | ~_GEN_77) begin
+                if (_GEN_53) begin
+                end
+                else
+                  active_12 <= bank_r8_12_4;
+              end
+              else
+                active_12 <= aluBus;
+            end
+            else if (_GEN_77)
+              active_12 <= aluBus;
+            else if (_GEN_53) begin
+            end
+            else
+              active_12 <= bank_r8_12_4;
+          end
+          else if (_GEN_77)
+            active_12 <= aluBus;
+          else if (_GEN_53) begin
+          end
+          else
+            active_12 <= bank_r8_12_4;
+        end
+        else if (_GEN_53) begin
+        end
+        else
+          active_12 <= bank_r8_12_4;
+      end
+      if (io_state_writeEnable_0 & _GEN_20 & io_state_address_0[3:0] == 4'hD)
+        active_13 <= io_state_writeData_0;
+      else if (enable) begin
+        automatic logic [31:0] _GEN_78;
+        _GEN_78 = _GEN_17[newGrp];
+        if (control_regWriteEnable) begin
+          if (control_regUserWrite) begin
+            if (_GEN_54) begin
+              if (inGrp0)
+                active_13 <= aluBus;
+              else if (_GEN_52) begin
+              end
+              else
+                active_13 <= _GEN_78;
+            end
+            else if (_GEN_55) begin
+              if (_GEN_52) begin
+              end
+              else
+                active_13 <= _GEN_78;
+            end
+            else if (_GEN_57) begin
+              if (inFiq | ~_GEN_54) begin
+                if (_GEN_52) begin
+                end
+                else
+                  active_13 <= _GEN_78;
+              end
+              else
+                active_13 <= aluBus;
+            end
+            else if (_GEN_54)
+              active_13 <= aluBus;
+            else if (_GEN_52) begin
+            end
+            else
+              active_13 <= _GEN_78;
+          end
+          else if (_GEN_54)
+            active_13 <= aluBus;
+          else if (_GEN_52) begin
+          end
+          else
+            active_13 <= _GEN_78;
+        end
+        else if (_GEN_52) begin
+        end
+        else
+          active_13 <= _GEN_78;
+      end
+      if (io_state_writeEnable_0 & _GEN_20 & io_state_address_0[3:0] == 4'hE)
+        active_14 <= io_state_writeData_0;
+      else if (enable) begin
+        automatic logic [31:0] _GEN_79;
+        _GEN_79 = _GEN_18[newGrp];
+        if (control_regWriteEnable) begin
+          if (control_regUserWrite) begin
+            if (_GEN_54) begin
+              if (_GEN_52) begin
+              end
+              else
+                active_14 <= _GEN_79;
+            end
+            else if (_GEN_55) begin
+              if (inGrp0)
+                active_14 <= aluBus;
+              else if (_GEN_52) begin
+              end
+              else
+                active_14 <= _GEN_79;
+            end
+            else if (_GEN_57) begin
+              if (inFiq | ~_GEN_55) begin
+                if (_GEN_52) begin
+                end
+                else
+                  active_14 <= _GEN_79;
+              end
+              else
+                active_14 <= aluBus;
+            end
+            else if (_GEN_55)
+              active_14 <= aluBus;
+            else if (_GEN_52) begin
+            end
+            else
+              active_14 <= _GEN_79;
+          end
+          else if (_GEN_55)
+            active_14 <= aluBus;
+          else if (_GEN_52) begin
+          end
+          else
+            active_14 <= _GEN_79;
+        end
+        else if (_GEN_52) begin
+        end
+        else
+          active_14 <= _GEN_79;
+      end
+      if (io_state_writeEnable_0 & _GEN_20 & (&(io_state_address_0[3:0])))
+        active_15 <= io_state_writeData_0;
       else if (enable) begin
         if (control_pcNext)
-          registers_15 <= incrementerBus & 32'hFFFFFFFE;
-        else if (control_regWriteEnable & wphys == 5'hF)
-          registers_15 <= aluBus;
+          active_15 <= incrementerBus & 32'hFFFFFFFE;
+        else if (control_regWriteEnable) begin
+          if (control_regUserWrite) begin
+            if (~_GEN_59) begin
+              if (_GEN_57) begin
+                if (inFiq | ~(&control_regWriteIndex)) begin
+                end
+                else
+                  active_15 <= aluBus;
+              end
+              else if (&control_regWriteIndex)
+                active_15 <= aluBus;
+            end
+          end
+          else if (&control_regWriteIndex)
+            active_15 <= aluBus;
+        end
       end
-      if (io_state_writeEnable_0 & _GEN_20 & io_state_address_0[4:0] == 5'h10)
-        registers_16 <= io_state_writeData_0;
-      else if (enable & control_regWriteEnable & wphys == 5'h10)
-        registers_16 <= aluBus;
-      if (io_state_writeEnable_0 & _GEN_20 & io_state_address_0[4:0] == 5'h11)
-        registers_17 <= io_state_writeData_0;
-      else if (enable & control_regWriteEnable & wphys == 5'h11)
-        registers_17 <= aluBus;
-      if (io_state_writeEnable_0 & _GEN_20 & io_state_address_0[4:0] == 5'h12)
-        registers_18 <= io_state_writeData_0;
-      else if (enable & control_regWriteEnable & wphys == 5'h12)
-        registers_18 <= aluBus;
-      if (io_state_writeEnable_0 & _GEN_20 & io_state_address_0[4:0] == 5'h13)
-        registers_19 <= io_state_writeData_0;
-      else if (enable & control_regWriteEnable & wphys == 5'h13)
-        registers_19 <= aluBus;
-      if (io_state_writeEnable_0 & _GEN_20 & io_state_address_0[4:0] == 5'h14)
-        registers_20 <= io_state_writeData_0;
-      else if (enable & control_regWriteEnable & wphys == 5'h14)
-        registers_20 <= aluBus;
-      if (io_state_writeEnable_0 & _GEN_20 & io_state_address_0[4:0] == 5'h15)
-        registers_21 <= io_state_writeData_0;
-      else if (enable & control_regWriteEnable & wphys == 5'h15)
-        registers_21 <= aluBus;
-      if (io_state_writeEnable_0 & _GEN_20 & io_state_address_0[4:0] == 5'h16)
-        registers_22 <= io_state_writeData_0;
-      else if (enable & control_regWriteEnable & wphys == 5'h16)
-        registers_22 <= aluBus;
-      if (io_state_writeEnable_0 & _GEN_20 & io_state_address_0[4:0] == 5'h17)
-        registers_23 <= io_state_writeData_0;
-      else if (enable & control_regWriteEnable & wphys == 5'h17)
-        registers_23 <= aluBus;
-      if (io_state_writeEnable_0 & _GEN_20 & io_state_address_0[4:0] == 5'h18)
-        registers_24 <= io_state_writeData_0;
-      else if (enable & control_regWriteEnable & wphys == 5'h18)
-        registers_24 <= aluBus;
-      if (io_state_writeEnable_0 & _GEN_20 & io_state_address_0[4:0] == 5'h19)
-        registers_25 <= io_state_writeData_0;
-      else if (enable & control_regWriteEnable & wphys == 5'h19)
-        registers_25 <= aluBus;
-      if (io_state_writeEnable_0 & _GEN_20 & io_state_address_0[4:0] == 5'h1A)
-        registers_26 <= io_state_writeData_0;
-      else if (enable & control_regWriteEnable & wphys == 5'h1A)
-        registers_26 <= aluBus;
-      if (io_state_writeEnable_0 & _GEN_20 & io_state_address_0[4:0] == 5'h1B)
-        registers_27 <= io_state_writeData_0;
-      else if (enable & control_regWriteEnable & wphys == 5'h1B)
-        registers_27 <= aluBus;
-      if (io_state_writeEnable_0 & _GEN_20 & io_state_address_0[4:0] == 5'h1C)
-        registers_28 <= io_state_writeData_0;
-      else if (enable & control_regWriteEnable & wphys == 5'h1C)
-        registers_28 <= aluBus;
-      if (io_state_writeEnable_0 & _GEN_20 & io_state_address_0[4:0] == 5'h1D)
-        registers_29 <= io_state_writeData_0;
-      else if (enable & control_regWriteEnable & wphys == 5'h1D)
-        registers_29 <= aluBus;
-      if (io_state_writeEnable_0 & _GEN_20 & io_state_address_0[4:0] == 5'h1E)
-        registers_30 <= io_state_writeData_0;
-      else if (enable & control_regWriteEnable & wphys == 5'h1E)
-        registers_30 <= aluBus;
-      if (~io_state_writeEnable_0 | _GEN_20 | ~_GEN_21) begin
+      if (~io_state_writeEnable_0 | _GEN_20 | ~(_GEN_21 & io_state_address_0[2:0] == 3'h0)) begin
+        if (enable) begin
+          if (~(control_regWriteEnable & control_regUserWrite & _GEN_54) | inGrp0) begin
+            if (_GEN_45) begin
+            end
+            else
+              bank_r13_0 <= active_13;
+          end
+          else
+            bank_r13_0 <= aluBus;
+        end
+      end
+      else
+        bank_r13_0 <= io_state_writeData_0;
+      if (~io_state_writeEnable_0 | _GEN_20 | ~(_GEN_21 & io_state_address_0[2:0] == 3'h1)) begin
+        if (_GEN_47) begin
+        end
+        else
+          bank_r13_1 <= active_13;
+      end
+      else
+        bank_r13_1 <= io_state_writeData_0;
+      if (~io_state_writeEnable_0 | _GEN_20 | ~(_GEN_21 & io_state_address_0[2:0] == 3'h2)) begin
+        if (_GEN_48) begin
+        end
+        else
+          bank_r13_2 <= active_13;
+      end
+      else
+        bank_r13_2 <= io_state_writeData_0;
+      if (~io_state_writeEnable_0 | _GEN_20 | ~(_GEN_21 & io_state_address_0[2:0] == 3'h3)) begin
+        if (_GEN_49) begin
+        end
+        else
+          bank_r13_3 <= active_13;
+      end
+      else
+        bank_r13_3 <= io_state_writeData_0;
+      if (~io_state_writeEnable_0 | _GEN_20 | ~(_GEN_21 & io_state_address_0[2:0] == 3'h4)) begin
+        if (_GEN_50) begin
+        end
+        else
+          bank_r13_4 <= active_13;
+      end
+      else
+        bank_r13_4 <= io_state_writeData_0;
+      if (~io_state_writeEnable_0 | _GEN_20 | ~(_GEN_21 & io_state_address_0[2:0] == 3'h5)) begin
+        if (_GEN_51) begin
+        end
+        else
+          bank_r13_5 <= active_13;
+      end
+      else
+        bank_r13_5 <= io_state_writeData_0;
+      if (~io_state_writeEnable_0 | _GEN_62 | ~(_GEN_22 & _GEN_61 == 3'h0)) begin
+        if (enable) begin
+          if (~_GEN_56 | _GEN_54 | ~_GEN_55 | inGrp0) begin
+            if (_GEN_45) begin
+            end
+            else
+              bank_r14_0 <= active_14;
+          end
+          else
+            bank_r14_0 <= aluBus;
+        end
+      end
+      else
+        bank_r14_0 <= io_state_writeData_0;
+      if (~io_state_writeEnable_0 | _GEN_62 | ~(_GEN_22 & _GEN_61 == 3'h1)) begin
+        if (_GEN_47) begin
+        end
+        else
+          bank_r14_1 <= active_14;
+      end
+      else
+        bank_r14_1 <= io_state_writeData_0;
+      if (~io_state_writeEnable_0 | _GEN_62 | ~(_GEN_22 & _GEN_61 == 3'h2)) begin
+        if (_GEN_48) begin
+        end
+        else
+          bank_r14_2 <= active_14;
+      end
+      else
+        bank_r14_2 <= io_state_writeData_0;
+      if (~io_state_writeEnable_0 | _GEN_62 | ~(_GEN_22 & _GEN_61 == 3'h3)) begin
+        if (_GEN_49) begin
+        end
+        else
+          bank_r14_3 <= active_14;
+      end
+      else
+        bank_r14_3 <= io_state_writeData_0;
+      if (~io_state_writeEnable_0 | _GEN_62 | ~(_GEN_22 & _GEN_61 == 3'h4)) begin
+        if (_GEN_50) begin
+        end
+        else
+          bank_r14_4 <= active_14;
+      end
+      else
+        bank_r14_4 <= io_state_writeData_0;
+      if (~io_state_writeEnable_0 | _GEN_62 | ~(_GEN_22 & _GEN_61 == 3'h5)) begin
+        if (_GEN_51) begin
+        end
+        else
+          bank_r14_5 <= active_14;
+      end
+      else
+        bank_r14_5 <= io_state_writeData_0;
+      if (~io_state_writeEnable_0 | _GEN_64 | ~(_GEN_23 & _GEN_63 == 3'h0)) begin
+        if (enable) begin
+          if (~_GEN_56 | _GEN_59 | ~(_GEN_57 & inFiq & _GEN_58 == 3'h0)) begin
+            if (_GEN_53) begin
+            end
+            else
+              bank_r8_12_0 <= active_8;
+          end
+          else
+            bank_r8_12_0 <= aluBus;
+        end
+      end
+      else
+        bank_r8_12_0 <= io_state_writeData_0;
+      if (~io_state_writeEnable_0 | _GEN_64 | ~(_GEN_23 & _GEN_63 == 3'h1)) begin
+        if (enable) begin
+          if (~_GEN_56 | _GEN_59 | ~(_GEN_57 & inFiq & _GEN_58 == 3'h1)) begin
+            if (_GEN_53) begin
+            end
+            else
+              bank_r8_12_1 <= active_9;
+          end
+          else
+            bank_r8_12_1 <= aluBus;
+        end
+      end
+      else
+        bank_r8_12_1 <= io_state_writeData_0;
+      if (~io_state_writeEnable_0 | _GEN_64 | ~(_GEN_23 & _GEN_63 == 3'h2)) begin
+        if (enable) begin
+          if (~_GEN_56 | _GEN_59 | ~(_GEN_57 & inFiq & _GEN_58 == 3'h2)) begin
+            if (_GEN_53) begin
+            end
+            else
+              bank_r8_12_2 <= active_10;
+          end
+          else
+            bank_r8_12_2 <= aluBus;
+        end
+      end
+      else
+        bank_r8_12_2 <= io_state_writeData_0;
+      if (~io_state_writeEnable_0 | _GEN_64 | ~(_GEN_23 & _GEN_63 == 3'h3)) begin
+        if (enable) begin
+          if (~_GEN_56 | _GEN_59 | ~(_GEN_57 & inFiq & _GEN_58 == 3'h3)) begin
+            if (_GEN_53) begin
+            end
+            else
+              bank_r8_12_3 <= active_11;
+          end
+          else
+            bank_r8_12_3 <= aluBus;
+        end
+      end
+      else
+        bank_r8_12_3 <= io_state_writeData_0;
+      if (~io_state_writeEnable_0 | _GEN_64 | ~(_GEN_23 & _GEN_63 == 3'h4)) begin
+        if (enable) begin
+          if (~_GEN_56 | _GEN_59 | ~(_GEN_57 & inFiq & _GEN_58 == 3'h4)) begin
+            if (_GEN_53) begin
+            end
+            else
+              bank_r8_12_4 <= active_12;
+          end
+          else
+            bank_r8_12_4 <= aluBus;
+        end
+      end
+      else
+        bank_r8_12_4 <= io_state_writeData_0;
+      if (~io_state_writeEnable_0 | _GEN_20 | _GEN_21 | _GEN_22 | _GEN_23 | ~_GEN_24) begin
         if (enable) begin
           cpsr_cond_n <= nextCpsr_cond_n;
           cpsr_cond_z <= nextCpsr_cond_z;
@@ -1173,9 +1667,9 @@ module ARM7TDMI(
   end // always @(posedge)
   wire              control_advancePipeline;
   wire              control_flushPipeline;
-  assign _decodeUnit_io_state_address = io_state_address_0 + 6'h18;
+  assign _decodeUnit_io_state_address = io_state_address_0 + 6'h16;
   assign _decodeUnit_io_state_writeEnable =
-    io_state_writeEnable_0 & io_state_address_0 > 6'h27 & _decodeUnit_io_state_writeEnable_T_2;
+    io_state_writeEnable_0 & io_state_address_0 > 6'h29 & _decodeUnit_io_state_writeEnable_T_2;
   Decoder decodeUnit (
     .clock                   (clock),
     .reset                   (reset),
@@ -1203,9 +1697,9 @@ module ARM7TDMI(
     .io_state_readData       (_decodeUnit_io_state_readData)
   );
   assign _controlUnit_io_multiplierDone = _multiplier_io_done;
-  assign _controlUnit_io_state_address = io_state_address_0 + 6'h13;
+  assign _controlUnit_io_state_address = io_state_address_0 + 6'h11;
   assign _controlUnit_io_state_writeEnable =
-    io_state_writeEnable_0 & io_state_address_0 > 6'h2C & _controlUnit_io_state_writeEnable_T_2;
+    io_state_writeEnable_0 & io_state_address_0 > 6'h2E & _controlUnit_io_state_writeEnable_T_2;
   Control controlUnit (
     .clock                              (clock),
     .reset                              (reset),
@@ -1296,9 +1790,9 @@ module ARM7TDMI(
   assign _shifter_io_shiftAmount =
     control_shiftByAddressAlign ? {1'h0, lastMemReadAlign, 3'h0} : control_shiftImmediate;
   assign _shifter_io_latchShift = enable & control_shiftDoLatch;
-  assign _shifter_io_state_address = io_state_address_0 + 6'h9;
+  assign _shifter_io_state_address = io_state_address_0 + 6'h7;
   assign _shifter_io_state_writeEnable =
-    io_state_writeEnable_0 & io_state_address_0 > 6'h36 & io_state_address_0[5:3] != 3'h7;
+    io_state_writeEnable_0 & io_state_address_0 > 6'h38 & io_state_address_0 < 6'h3A;
   Shifter shifter (
     .clock                (clock),
     .io_in                (bBus),
@@ -1330,9 +1824,9 @@ module ARM7TDMI(
     .io_flagOut_c    (aluConditionOut_c),
     .io_flagOut_v    (aluConditionOut_v)
   );
-  assign _multiplier_io_state_address = io_state_address_0 + 6'hE;
+  assign _multiplier_io_state_address = io_state_address_0 + 6'hC;
   assign _multiplier_io_state_writeEnable =
-    io_state_writeEnable_0 & io_state_address_0 > 6'h31 & _multiplier_io_state_writeEnable_T_2;
+    io_state_writeEnable_0 & io_state_address_0 > 6'h33 & _multiplier_io_state_writeEnable_T_2;
   Multiplier multiplier (
     .clock                (clock),
     .reset                (reset),

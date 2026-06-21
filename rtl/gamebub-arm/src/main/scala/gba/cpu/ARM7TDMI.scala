@@ -76,58 +76,54 @@ class ARM7TDMI extends Module {
   }
 
   ///////////////////////////////////// Register File //////////////////////////////////////
-  // 0-15: r0-r15
-  // 16: 13_svc, 17: 14_svc,
-  // 18: 13_abt, 19: 14_abt,
-  // 20: 13_und, 21: 14_und,
-  // 22: 13_irq, 23: 14_irq
-  // 24-30: 8-14 _fiq
-  val registers = RegInit(VecInit.fill(31)(0.U(32.W)))
-  private def bankRegIndex(index: UInt, mode: CpuMode.Type = control.regBankMode): UInt = {
-    val offset = WireDefault(0.U(5.W))
-    when (mode === CpuMode.Fiq && index >= 8.U && index <= 14.U) {
-      offset := (24 - 8).U(5.W)
-    } .elsewhen (index === 13.U || index === 14.U) {
-      when (mode === CpuMode.Supervisor) {
-        offset := (16 - 13).U(5.W)
-      } .elsewhen (mode === CpuMode.Abort) {
-        offset := (18 - 13).U(5.W)
-      } .elsewhen (mode === CpuMode.Undefined) {
-        offset := (20 - 13).U(5.W)
-      } .elsewhen (mode === CpuMode.Irq) {
-        offset := (22 - 13).U(5.W)
-      }
-    }
-    index + offset
-  }
+  // Working-set register file: `active` always holds the current mode's r0-r15, so the
+  // hot-path operand reads and the writeback hit it directly -- no banking mux, no offset
+  // adder, and half the writeback fan-out of the old flat 31-entry file. The inactive
+  // banked copies live in `bank*` and are swapped with `active` only on a mode change
+  // (see the swap block in `when(enable)` below); mode changes are rare and the swap is
+  // atomic with the cpsr.mode update, so it costs no extra cycle.
+  //   bank_r13/bank_r14: indexed by mode group 0=User/System 1=Fiq 2=Irq 3=Supervisor
+  //                      4=Abort 5=Undefined (the active group's slot is stale).
+  //   bank_r8_12: the *inactive* r8-r12 group (FIQ's copy when not in FIQ; User's in FIQ).
+  val active     = RegInit(VecInit.fill(16)(0.U(32.W)))
+  val bank_r13   = RegInit(VecInit.fill(6)(0.U(32.W)))
+  val bank_r14   = RegInit(VecInit.fill(6)(0.U(32.W)))
+  val bank_r8_12 = RegInit(VecInit.fill(5)(0.U(32.W)))
 
-  // Banked register *read* that avoids the bank-offset adder sitting in series
-  // ahead of a 31-deep Vec read mux (the dominant chunk of the 50 MHz critical
-  // read path). The common case (r0-r15) is a direct 16:1 read; the few banked
-  // physical copies (16-30) are read in parallel and selected late by mode.
-  // Must stay bit-identical to bankRegIndex() for every read. Used for operand
-  // reads only; writes still go through bankRegIndex (off the critical path).
-  private def bankedRead(index: UInt, mode: CpuMode.Type): UInt = {
-    val base = registers(index)                       // r0..r15, direct 16:1
-    val fiqBank = MuxLookup(index, base)(Seq(          // r8..r14 -> phys 24..30
-      8.U  -> registers(24.U),
-      9.U  -> registers(25.U),
-      10.U -> registers(26.U),
-      11.U -> registers(27.U),
-      12.U -> registers(28.U),
-      13.U -> registers(29.U),
-      14.U -> registers(30.U),
-    ))
-    val hi = index === 14.U                            // false => r13, true => r14
-    val shadow = MuxLookup(mode, base)(Seq(            // r13/r14 per privileged mode
-      CpuMode.Supervisor -> Mux(hi, registers(17.U), registers(16.U)),
-      CpuMode.Abort      -> Mux(hi, registers(19.U), registers(18.U)),
-      CpuMode.Undefined  -> Mux(hi, registers(21.U), registers(20.U)),
-      CpuMode.Irq        -> Mux(hi, registers(23.U), registers(22.U)),
-    ))
-    val is1314 = (index === 13.U) || (index === 14.U)
-    val fiqHit = (mode === CpuMode.Fiq) && (index >= 8.U) && (index <= 14.U)
-    Mux(fiqHit, fiqBank, Mux(is1314, shadow, base))
+  private def modeToGroup(mode: CpuMode.Type): UInt = MuxLookup(mode, 0.U)(Seq(
+    CpuMode.Fiq        -> 1.U,
+    CpuMode.Irq        -> 2.U,
+    CpuMode.Supervisor -> 3.U,
+    CpuMode.Abort      -> 4.U,
+    CpuMode.Undefined  -> 5.U,
+  )) // User / System -> group 0
+
+  // User-bank access for LDM/STM with `^` (regUserReadC / regUserWrite): read/write the
+  // User-mode view regardless of current mode. Off the hot path. Only FIQ banks r8-r12,
+  // and only non-{User,System} modes bank r13/r14 away from the User copies.
+  private def userBankIdx8_12(index: UInt): UInt =
+    Mux((index >= 8.U) && (index <= 12.U), index - 8.U, 0.U)
+  private def userRegRead(index: UInt): UInt = {
+    val inFiq  = cpsr.mode === CpuMode.Fiq
+    val inGrp0 = (cpsr.mode === CpuMode.User) || (cpsr.mode === CpuMode.System)
+    Mux(index === 13.U, Mux(inGrp0, active(13.U), bank_r13(0.U)),
+    Mux(index === 14.U, Mux(inGrp0, active(14.U), bank_r14(0.U)),
+    Mux((index >= 8.U) && (index <= 12.U),
+        Mux(inFiq, bank_r8_12(userBankIdx8_12(index)), active(index)),
+        active(index))))                                            // r0-r7, r15
+  }
+  private def userRegWrite(index: UInt, data: UInt): Unit = {
+    val inFiq  = cpsr.mode === CpuMode.Fiq
+    val inGrp0 = (cpsr.mode === CpuMode.User) || (cpsr.mode === CpuMode.System)
+    when (index === 13.U) {
+      when (inGrp0) { active(13.U) := data } .otherwise { bank_r13(0.U) := data }
+    } .elsewhen (index === 14.U) {
+      when (inGrp0) { active(14.U) := data } .otherwise { bank_r14(0.U) := data }
+    } .elsewhen ((index >= 8.U) && (index <= 12.U)) {
+      when (inFiq) { bank_r8_12(userBankIdx8_12(index)) := data } .otherwise { active(index) := data }
+    } .otherwise {
+      active(index) := data                                        // r0-r7, r15
+    }
   }
 
   val cpsr = RegInit((new ProgramStatusRegister).Lit(
@@ -159,19 +155,13 @@ class ARM7TDMI extends Module {
   controlUnit.io.currentStatus := cpsr
   controlUnit.io.nextStatus := nextCpsr
   cpsrBus := cpsr
-  val pc = registers(15)
+  val pc = active(15.U)
   pcBus := pc
-  // Operand reads bank purely off the *current* CPSR mode (a stable register
-  // output), NOT control.regBankMode. control.regBankMode is overridden to the
-  // exception's newMode inside an `execute`-gated (condition-eval) branch, which
-  // would otherwise place the condition evaluation in series before the read-port
-  // bankRegIndex adder — the front of the 50 MHz critical path. The exception
-  // cycle only reads r15 (PC, unbanked), so newMode is never needed for a read;
-  // it is still used for the banked *writeback* below. This is timing-only.
-  val regReadBankMode = cpsr.mode
-  aBus := bankedRead(control.regReadA, regReadBankMode)
+  // `active` already holds the current mode's r0-r15, so operand reads are a direct
+  // 16:1 read -- no banking mux, no offset adder (the old 50 MHz critical front).
+  aBus := active(control.regReadA)
   when (control.busB === BusBValue.RegisterB) {
-    bBus := bankedRead(control.regReadB, regReadBankMode)
+    bBus := active(control.regReadB)
   } .elsewhen (control.busB === BusBValue.Cpsr) {
     bBus := cpsr.asUInt
   } .elsewhen (control.busB === BusBValue.Spsr) {
@@ -182,32 +172,9 @@ class ARM7TDMI extends Module {
       bBus := cpsr.asUInt
     }
   }
-  cBus := bankedRead(
-    control.regReadC,
-    Mux(control.regUserReadC, CpuMode.User, regReadBankMode)
-  )
+  // cBus: current mode normally; the User bank for LDM/STM with `^` (off the hot path).
+  cBus := Mux(control.regUserReadC, userRegRead(control.regReadC), active(control.regReadC))
   when (enable) {
-    when (control.regWriteEnable) {
-      logger.debug(cf"  reg write [${control.regWriteIndex}] <- ${aluBus}%x")
-      // Writes to PC are always aligned by 2, but there's no need to do that here,
-      // because r15 writes via regWriteEnable are always followed by an incrementer write.
-      // Flattened bank write index: select the physical register from a mux of
-      // constants (early mode/index), not the bankRegIndex `index + offset` adder.
-      // Must stay bit-identical to bankRegIndex().
-      val wmode = Mux(control.regUserWrite, CpuMode.User, control.regBankMode)
-      val widx  = control.regWriteIndex
-      val whi   = widx === 14.U
-      val wfiq  = (wmode === CpuMode.Fiq) && (widx >= 8.U) && (widx <= 14.U)
-      val wshadow = MuxLookup(wmode, widx)(Seq(   // r13/r14 banked physical index
-        CpuMode.Supervisor -> Mux(whi, 17.U, 16.U),
-        CpuMode.Abort      -> Mux(whi, 19.U, 18.U),
-        CpuMode.Undefined  -> Mux(whi, 21.U, 20.U),
-        CpuMode.Irq        -> Mux(whi, 23.U, 22.U),
-      ))
-      val wphys = Mux(wfiq, Cat(1.U(1.W), widx(3, 0)),                  // r8..r14 fiq -> 24..30
-                  Mux((widx === 13.U) || (widx === 14.U), wshadow, widx))
-      registers(wphys) := aluBus
-    }
     when (control.cpsrUpdateCond) {
       nextCpsr.cond := aluConditionOut
     }
@@ -245,6 +212,43 @@ class ARM7TDMI extends Module {
       }
       spsr := cpsrBus
     }
+
+    // Mode-change bank swap: one detection point for every mode-change site above
+    // (exception entry, MSR, exception return). The swap is just concurrent registered
+    // moves done at the same edge as the cpsr.mode change, so it adds no cycle. r13/r14
+    // bank across mode groups; r8-r12 only across the FIQ boundary. (User<->System are
+    // the same group, so they correctly do nothing.)
+    val modeChanging = nextCpsr.mode =/= cpsr.mode
+    when (modeChanging) {
+      val oldGrp = modeToGroup(cpsr.mode)
+      val newGrp = modeToGroup(nextCpsr.mode)
+      when (oldGrp =/= newGrp) {
+        bank_r13(oldGrp) := active(13.U)              // save outgoing mode's r13/r14
+        bank_r14(oldGrp) := active(14.U)
+        active(13.U) := bank_r13(newGrp)              // load incoming mode's r13/r14
+        active(14.U) := bank_r14(newGrp)
+      }
+      when ((cpsr.mode === CpuMode.Fiq) =/= (nextCpsr.mode === CpuMode.Fiq)) {
+        for (i <- 0 until 5) {                        // swap r8-r12 across the FIQ boundary
+          active((i + 8).U) := bank_r8_12(i.U)
+          bank_r8_12(i.U)   := active((i + 8).U)
+        }
+      }
+    }
+
+    // Register writeback -- after the swap, so an explicit write (e.g. exception entry's
+    // LR_newmode := PC) wins over the swap-load for that register. `active` is the current
+    // mode's view, so a normal write is a direct 16-target write (half the old fan-out);
+    // the User bank (LDM/STM `^`) takes the off-hot-path helper.
+    when (control.regWriteEnable) {
+      logger.debug(cf"  reg write [${control.regWriteIndex}] <- ${aluBus}%x")
+      when (control.regUserWrite) {
+        userRegWrite(control.regWriteIndex, aluBus)
+      } .otherwise {
+        active(control.regWriteIndex) := aluBus
+      }
+    }
+
     switch (control.pcNext) {
       is (PcNext.Incrementer) {
         // PC is always aligned to 2
@@ -385,13 +389,16 @@ class ARM7TDMI extends Module {
   freeze := io.saveReq && (halted || atSafePoint)
   io.safe := freeze
 
-  // Route the shared 32-bit state port. Global word map:
-  //   0..30 registers, 31 cpsr, 32..36 spsr, 37 memAddrReg, 38 memReadDataReg,
-  //   39 {lastMemReadWidth, currentMemReadWidth, lastMemReadAlign},
-  //   40..44 Decoder, 45..49 Control, 50..54 Multiplier, 55 Shifter.
+  // Route the shared 32-bit state port. Global word map (NOTE: layout changed with the
+  // working-set register file -- savestate format is NOT compatible with older builds):
+  //   0..15   active[0..15] (current mode r0-r15)
+  //   16..21  bank_r13[0..5]   22..27 bank_r14[0..5]   28..32 bank_r8_12[0..4]
+  //   33 cpsr, 34..38 spsr, 39 memAddrReg, 40 memReadDataReg,
+  //   41 {lastMemReadWidth, currentMemReadWidth, lastMemReadAlign},
+  //   42..46 Decoder, 47..51 Control, 52..56 Multiplier, 57 Shifter.
   for ((unit, base, end) <- Seq(
-    (decodeUnit.io.state, 40, 45), (controlUnit.io.state, 45, 50),
-    (multiplier.io.state, 50, 55), (shifter.io.state, 55, 56),
+    (decodeUnit.io.state, 42, 47), (controlUnit.io.state, 47, 52),
+    (multiplier.io.state, 52, 57), (shifter.io.state, 57, 58),
   )) {
     unit.address := io.state.address - base.U
     unit.writeData := io.state.writeData
@@ -400,23 +407,29 @@ class ARM7TDMI extends Module {
 
   // Read mux over the whole map.
   io.state.readData := 0.U
-  when (io.state.address < 31.U) {
-    io.state.readData := registers(io.state.address)
-  } .elsewhen (io.state.address === 31.U) {
+  when (io.state.address < 16.U) {
+    io.state.readData := active(io.state.address)
+  } .elsewhen (io.state.address < 22.U) {
+    io.state.readData := bank_r13(io.state.address - 16.U)
+  } .elsewhen (io.state.address < 28.U) {
+    io.state.readData := bank_r14(io.state.address - 22.U)
+  } .elsewhen (io.state.address < 33.U) {
+    io.state.readData := bank_r8_12(io.state.address - 28.U)
+  } .elsewhen (io.state.address === 33.U) {
     io.state.readData := cpsr.asUInt
-  } .elsewhen (io.state.address < 37.U) {
-    io.state.readData := spsrVec(io.state.address - 32.U).asUInt
-  } .elsewhen (io.state.address === 37.U) {
-    io.state.readData := memAddrReg
-  } .elsewhen (io.state.address === 38.U) {
-    io.state.readData := memReadDataReg
+  } .elsewhen (io.state.address < 39.U) {
+    io.state.readData := spsrVec(io.state.address - 34.U).asUInt
   } .elsewhen (io.state.address === 39.U) {
+    io.state.readData := memAddrReg
+  } .elsewhen (io.state.address === 40.U) {
+    io.state.readData := memReadDataReg
+  } .elsewhen (io.state.address === 41.U) {
     io.state.readData := Cat(lastMemReadWidth.asUInt.pad(2), currentMemReadWidth.asUInt.pad(2), lastMemReadAlign)
-  } .elsewhen (io.state.address < 45.U) {
+  } .elsewhen (io.state.address < 47.U) {
     io.state.readData := decodeUnit.io.state.readData
-  } .elsewhen (io.state.address < 50.U) {
+  } .elsewhen (io.state.address < 52.U) {
     io.state.readData := controlUnit.io.state.readData
-  } .elsewhen (io.state.address < 55.U) {
+  } .elsewhen (io.state.address < 57.U) {
     io.state.readData := multiplier.io.state.readData
   } .otherwise {
     io.state.readData := shifter.io.state.readData
@@ -427,17 +440,23 @@ class ARM7TDMI extends Module {
   // block so it wins while the CPU is frozen.
   when (io.state.writeEnable) {
     suppressEnumCastWarning {
-      when (io.state.address < 31.U) {
-        registers(io.state.address) := io.state.writeData
-      } .elsewhen (io.state.address === 31.U) {
+      when (io.state.address < 16.U) {
+        active(io.state.address) := io.state.writeData
+      } .elsewhen (io.state.address < 22.U) {
+        bank_r13(io.state.address - 16.U) := io.state.writeData
+      } .elsewhen (io.state.address < 28.U) {
+        bank_r14(io.state.address - 22.U) := io.state.writeData
+      } .elsewhen (io.state.address < 33.U) {
+        bank_r8_12(io.state.address - 28.U) := io.state.writeData
+      } .elsewhen (io.state.address === 33.U) {
         cpsr := io.state.writeData.asTypeOf(new ProgramStatusRegister)
-      } .elsewhen (io.state.address < 37.U) {
-        spsrVec(io.state.address - 32.U) := io.state.writeData.asTypeOf(new ProgramStatusRegister)
-      } .elsewhen (io.state.address === 37.U) {
-        memAddrReg := io.state.writeData
-      } .elsewhen (io.state.address === 38.U) {
-        memReadDataReg := io.state.writeData
+      } .elsewhen (io.state.address < 39.U) {
+        spsrVec(io.state.address - 34.U) := io.state.writeData.asTypeOf(new ProgramStatusRegister)
       } .elsewhen (io.state.address === 39.U) {
+        memAddrReg := io.state.writeData
+      } .elsewhen (io.state.address === 40.U) {
+        memReadDataReg := io.state.writeData
+      } .elsewhen (io.state.address === 41.U) {
         lastMemReadAlign := io.state.writeData(1, 0)
         currentMemReadWidth := io.state.writeData(3, 2).asTypeOf(BusAccessWidth())
         lastMemReadWidth := io.state.writeData(5, 4).asTypeOf(BusAccessWidth())
@@ -446,15 +465,13 @@ class ARM7TDMI extends Module {
   }
 
   ////////////////////////////////////////// Debug /////////////////////////////////////////
-  io.debug.registers := VecInit(
-    (0 until 16).map(i => registers(bankRegIndex(i.U)))
-  )
+  io.debug.registers := active   // current mode's r0-r15
   io.debug.cpsr := cpsr.asUInt
   when (enable) {
-    logger.debug(cf" r0: ${registers(0)}%x   r1: ${registers(1)}%x   r2: ${registers(2)}%x   r3: ${registers(3)}%x")
-    logger.debug(cf" r4: ${registers(4)}%x   r5: ${registers(5)}%x   r6: ${registers(6)}%x   r7: ${registers(7)}%x")
-    logger.debug(cf" r8: ${registers(bankRegIndex(8.U))}%x   r9: ${registers(bankRegIndex(9.U))}%x  r10: ${registers(bankRegIndex(10.U))}%x  r11: ${registers(bankRegIndex(11.U))}%x")
-    logger.debug(cf"r12: ${registers(bankRegIndex(12.U))}%x  r13: ${registers(bankRegIndex(13.U))}%x  r14: ${registers(bankRegIndex(14.U))}%x  r15: ${registers(15)}%x")
+    logger.debug(cf" r0: ${active(0)}%x   r1: ${active(1)}%x   r2: ${active(2)}%x   r3: ${active(3)}%x")
+    logger.debug(cf" r4: ${active(4)}%x   r5: ${active(5)}%x   r6: ${active(6)}%x   r7: ${active(7)}%x")
+    logger.debug(cf" r8: ${active(8)}%x   r9: ${active(9)}%x  r10: ${active(10)}%x  r11: ${active(11)}%x")
+    logger.debug(cf"r12: ${active(12)}%x  r13: ${active(13)}%x  r14: ${active(14)}%x  r15: ${active(15)}%x")
     logger.debug(cf"cpsr: ${cpsr.asUInt}%x")
   }
 }
