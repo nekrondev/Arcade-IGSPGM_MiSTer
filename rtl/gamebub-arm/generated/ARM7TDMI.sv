@@ -1336,6 +1336,7 @@ module ARM7TDMI(
     io_state_writeEnable_0 & io_state_address_0 > 6'h31 & _multiplier_io_state_writeEnable_T_2;
   Multiplier multiplier (
     .clock                (clock),
+    .reset                (reset),
     .io_enable            (enable),
     .io_a                 (aBus),
     .io_b                 (bBus),
