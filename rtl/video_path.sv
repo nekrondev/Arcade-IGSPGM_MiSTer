@@ -30,6 +30,8 @@ module video_path(
     input             rotate,
     input             rotate_ccw,
     input             flip,
+    input      [11:0] crop_size,
+    input       [4:0] crop_off,
     output            video_rotated,
 
     // Core video signal
@@ -186,8 +188,8 @@ video_freak video_freak(
     .VGA_DE_IN(VGA_DE_MIXER),
     .ARX((!ar) ? ( rotate ? 12'd3 : 12'd4 ) : (ar - 1'd1)),
     .ARY((!ar) ? ( rotate ? 12'd4 : 12'd3 ) : 12'd0),
-    .CROP_SIZE(0),
-    .CROP_OFF(0),
+    .CROP_SIZE(crop_size),
+    .CROP_OFF(crop_off),
     .SCALE(scale)
 );
 
