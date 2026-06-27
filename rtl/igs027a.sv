@@ -366,6 +366,7 @@ module igs027a #(
     wire        ramc_wr_req  = ss_iram_own ? ss_iram_wr  : (wr_pend & wsel_iram);
     wire [31:0] ramc_wr_addr = ss_iram_own ? ss_iram_addr
                                            : (PROT_IRAM_DDR_BASE + {13'd0, iram_off(wr_addr)});
+
     wire [31:0] ramc_wr_data = ss_iram_own ? ssbus_iram.data[31:0] : wr_data;
     wire [3:0]  ramc_wr_be   = ss_iram_own ? 4'hf : wr_be;
 
@@ -421,7 +422,7 @@ module igs027a #(
     wire        xr_wren_a  = ss_xor_sel ? ss_xor_wr            : xor_we;
     wire [3:0]  xr_be_a    = ss_xor_sel ? 4'hf                 : wr_be;
     wire [7:0]  xr_addr_a  = ss_xor_sel ? ssbus_xor.addr[7:0]  : wxor_idx;
-    wire [31:0] xr_data_a  = ss_xor_sel ? ssbus_xor.data[31:0] : wr_data;
+    wire [31:0] xr_data_a  = ss_xor_sel ? ssbus_xor.data[31:0] : arm_wdata;
     wire [7:0]  xr_addr_b  = ss_xor_sel ? ssbus_xor.addr[7:0]  : arm_addr[9:2];
 
     dualport_ram_be #(.BYTES(4), .WIDTHAD(8)) xortab (
@@ -571,13 +572,13 @@ module igs027a #(
 
             // type3 share-RAM bank select (ARM write to 0x40000018)
             if (arm_advance && wr_pend && wsel_bsel)
-                ram_sel <= wr_data[0];
+                ram_sel <= arm_wdata[0];
 
             if (arm_advance && wr_pend) begin
                 if (wsel_latch) begin
                     // ARM writes response.  type1 (0x40000000) also clears the
                     // consumed bits of the 68k command; type2 (0x38000000) does not.
-                    latch_arm_w <= wmerge(latch_arm_w, wr_data, wr_wmask);
+                    latch_arm_w <= wmerge(latch_arm_w, arm_wdata, wr_wmask);
                     if (wsel_lat_t1) latch_68k_w <= latch_68k_w & ~wr_wmask;
                 end
             end
