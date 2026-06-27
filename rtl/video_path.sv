@@ -118,6 +118,7 @@ video_hscale video_hscale(
     .r_in(core_r),
     .g_in(core_g),
     .b_in(core_b),
+    .hs_in(core_hs),
     .hb_in(core_hb),
     .vb_in(core_vb),
     .vs_in(resync_vs),
