@@ -940,7 +940,7 @@ wire arm_type3 = (game == GAME_DMNFRNT) || (game == GAME_THEGLAD) || (game == GA
 // IGS027A type1 CAVE (ket/espgal/ddp3): recreated internal ROM, latch-only, 20 MHz,
 // no external ARM ROM (arm_has_exrom stays 0 via the type2/3-only definition below).
 wire arm_type1_cave = (game == GAME_KET) || (game == GAME_ESPGAL) || (game == GAME_DDP3);
-wire arm_game = (game == GAME_KOVSH) || (game == GAME_PHOTOY2K) || (game == GAME_PUZZLI2) ||
+wire arm_game = (game == GAME_KOVSH) || (game == GAME_PHOTOY2K) || (game == GAME_PUZZLI2) || (game == GAME_PSTAR) ||
                 arm_type1_cave || arm_type2 || arm_type3;
 wire i22_game = (game == GAME_KILLBLD) || (game == GAME_DRGW3);
 
